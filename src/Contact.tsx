@@ -22,7 +22,7 @@ export default function Contact() {
 
         <div className="mt-4 flex flex-col gap-3">
           <a
-            href="mailto:sara@example.com"
+            href="mailto:yeokpeusseusarafiela@gmail.com"
             className="rounded-2xl bg-blue-500 px-4 py-3 text-center font-semibold text-white transition hover:bg-blue-600"
           >
             Envoyer un email
