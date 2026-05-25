@@ -1,0 +1,7 @@
+:root {
+   --color-ink: #1f2937;
+    --color-blue-500: #4f8cff;
+    --color-blue-600: #2563eb;
+    --color-coral-400: #ff7f66; }
+
+body { background: var(--color-bg); color: var(--color-ink); }
