@@ -11,8 +11,8 @@ export default function Contact() {
         </p>
 
         <div className="mt-4 space-y-3 text-sm text-slate-700">
-          <p>Email: sara@example.com</p>
-          <p>LinkedIn: linkedin.com/in/yourname</p>
+          <p>Email: yeokpeusseusarafiela@gmail.com</p>
+          <p>LinkedIn: linkedin.com/in/sara-kp-yeo</p>
           <p>Localisation: France</p>
         </div>
       </section>
@@ -29,7 +29,7 @@ export default function Contact() {
           </a>
 
           <a
-            href="https://linkedin.com"
+            href="https://www.linkedin.com/in/sara-kp-yeo/"
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center font-semibold text-slate-700 transition hover:bg-slate-100"

@@ -153,22 +153,16 @@ export default function Desktop() {
   };
 
   return (
-    <motion.main 
-      animate={{
-        background: [
-          "linear-gradient(to bottom, #2e1065, #6366f1, #f472b6)",
-          "linear-gradient(to bottom, #1e1b4b, #4f46e5, #ec4899)",
-          "linear-gradient(to bottom, #3b0764, #4338ca, #d946ef)",
-          "linear-gradient(to bottom, #2e1065, #6366f1, #f472b6)"
-        ]
-      }}
-      transition={{
-        duration: 20,
-        repeat: Infinity,
-        ease: "linear"
-      }}
-      className="relative min-h-dvh w-full overflow-hidden p-4 md:p-8 flex items-center justify-center"
+    <main 
+      className="relative min-h-dvh w-full overflow-hidden p-4 md:p-8 flex items-center justify-center bg-linear-to-br from-[#2e1065] via-[#6366f1] to-[#f472b6] bg-size-[400%_400%] animate-[gradientBG_15s_ease_infinite]"
     >
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes gradientBG {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}} />
       
       {/* ================= ÉCRAN DE CHARGEMENT INTÉGRAL (LOADING) ================= */}
       <AnimatePresence>
@@ -176,7 +170,7 @@ export default function Desktop() {
           <motion.div 
             exit={{ opacity: 0, scale: 1.05 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="fixed inset-0 bg-[#1e1b4b] z-[100] flex flex-col items-center justify-center p-6 font-mono select-none"
+            className="fixed inset-0 bg-[#1e1b4b] z-100 flex flex-col items-center justify-center p-6 font-mono select-none"
           >
             <motion.div 
               initial={{ y: -20, opacity: 0 }}
@@ -199,7 +193,7 @@ export default function Desktop() {
                 <div className="w-full">
                   <div className="w-full h-8 bg-slate-100 border-4 border-slate-900 rounded-xl p-1 overflow-hidden relative">
                     <motion.div 
-                      className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-sm"
+                      className="h-full bg-linear-to-r from-indigo-500 to-purple-600 rounded-sm"
                       style={{ width: `${loadingProgress}%` }}
                     />
                   </div>
@@ -216,34 +210,30 @@ export default function Desktop() {
 
       {/* ================= BACKGROUND GRAPHICS LAYER ================= */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
-        {/* Animated Background Orbs */}
         <motion.div 
           animate={{
-            x: [0, 40, -20, 0],
-            y: [0, -60, 30, 0],
-            scale: [1, 1.1, 0.9, 1]
+            x: [0, 60, -40, 0],
+            y: [0, -80, 40, 0],
           }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-pink-300/15 blur-3xl" 
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[10%] left-[30%] w-[600px] h-[600px] rounded-full bg-pink-400/20 blur-3xl" 
         />
         <motion.div 
           animate={{
-            x: [0, -30, 30, 0],
-            y: [0, 40, -40, 0],
+            x: [0, -50, 50, 0],
+            y: [0, 60, -60, 0],
           }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute bottom-[20%] left-[20%] w-[400px] h-[400px] rounded-full bg-indigo-400/10 blur-3xl" 
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="absolute bottom-[10%] right-[25%] w-[500px] h-[500px] rounded-full bg-indigo-500/15 blur-3xl" 
         />
 
-        {/* Ambient Moving Stars */}
         <div className="absolute inset-0 top-0 h-[60vh]">
-          <motion.div animate={{ opacity: [0.4, 1, 0.4], scale: [0.9, 1.1, 0.9] }} transition={{ duration: 3, repeat: Infinity }} className="absolute top-[8%] left-[12%] text-white text-xl font-serif">✦</motion.div>
-          <motion.div animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 4, repeat: Infinity, delay: 1 }} className="absolute top-[6%] left-[28%] text-pink-100/80 text-sm">✦</motion.div>
-          <motion.div animate={{ opacity: [0.2, 0.9, 0.2] }} transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }} className="absolute top-[14%] left-[40%] text-white/90 text-lg">✦</motion.div>
-          <motion.div animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }} transition={{ duration: 5, repeat: Infinity }} className="absolute top-[11%] left-[72%] text-white text-2xl font-serif">✦</motion.div>
+          <motion.div animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }} transition={{ duration: 4, repeat: Infinity }} className="absolute top-[12%] left-[15%] text-white text-xl font-serif">✦</motion.div>
+          <motion.div animate={{ opacity: [1, 0.2, 1] }} transition={{ duration: 5, repeat: Infinity, delay: 1.5 }} className="absolute top-[7%] left-[32%] text-pink-100/70 text-sm">✦</motion.div>
+          <motion.div animate={{ opacity: [0.1, 0.8, 0.1] }} transition={{ duration: 3.5, repeat: Infinity, delay: 0.7 }} className="absolute top-[18%] left-[45%] text-white/80 text-lg">✦</motion.div>
+          <motion.div animate={{ opacity: [0.4, 1, 0.4], scale: [1, 1.3, 1] }} transition={{ duration: 6, repeat: Infinity }} className="absolute top-[15%] left-[78%] text-white text-2xl font-serif">✦</motion.div>
         </div>
 
-        {/* Retro Mountains Layer */}
         {!isLoading && (
           <motion.div 
             initial={{ y: 200, opacity: 0 }} 
@@ -298,7 +288,7 @@ export default function Desktop() {
             )}
           </AnimatePresence>
 
-          {/* Carte de Présentation Profil Principale Harmonisée */}
+          {/* Carte de Présentation Profil Principale Agrandie */}
           <motion.div 
             variants={itemVariants}
             layout 
@@ -306,10 +296,10 @@ export default function Desktop() {
             className={`absolute z-10 w-full bg-white/95 backdrop-blur-md border-4 border-indigo-950 rounded-3xl shadow-[6px_6px_0px_0px_rgba(30,27,75,1)] flex flex-col overflow-hidden transition-all duration-500 ${
               hasOpenWindow 
                 ? "max-w-xs md:max-w-sm xl:max-w-md left-4 md:left-8 lg:left-16 xl:left-24 translate-x-0 hidden lg:flex" 
-                : "max-w-xl left-1/2 -translate-x-1/2"
+                : "max-w-2xl left-1/2 -translate-x-1/2" // Increased baseline layout width here
             }`}
           >
-            <div className="bg-indigo-950 px-4 py-3 flex items-center justify-between text-indigo-100 border-b-2 border-indigo-950">
+            <div className="bg-indigo-950 px-5 py-3.5 flex items-center justify-between text-indigo-100 border-b-2 border-indigo-950">
               <span className="text-xs font-mono tracking-wider font-bold opacity-90">C:/PORTFOLIO/home</span>
               <div className="flex gap-1.5 opacity-60">
                 <div className="w-3 h-3 rounded-full border-2 border-white bg-transparent" />
@@ -318,35 +308,35 @@ export default function Desktop() {
               </div>
             </div>
 
-            <div className="p-6 md:p-8 flex flex-col items-center">
-              <div className="flex items-center justify-between w-full gap-4 mb-6">
+            <div className={`flex flex-col items-center transition-all duration-500 ${hasOpenWindow ? "p-6" : "p-8 md:p-10"}`}>
+              <div className="flex items-center justify-between w-full gap-5 mb-6">
                 <div className="text-left">
-                  <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900">Sara Yeo</h1>
-                  <h2 className="text-sm md:text-md font-extrabold text-indigo-600 mt-1 uppercase tracking-wide">Product Manager / Product Owner</h2>
+                  <h1 className={`font-black tracking-tight text-slate-900 transition-all ${hasOpenWindow ? "text-2xl" : "text-3xl md:text-4xl"}`}>Sara Yeo</h1>
+                  <h2 className={`font-extrabold text-indigo-600 mt-1 uppercase tracking-wide transition-all ${hasOpenWindow ? "text-xs" : "text-sm md:text-base"}`}>Product Manager / Product Owner</h2>
                 </div>
-                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border-4 border-indigo-950 bg-indigo-50 overflow-hidden shadow-md shrink-0 flex items-center justify-center">
+                <div className={`rounded-full border-4 border-indigo-950 bg-indigo-50 overflow-hidden shadow-md shrink-0 flex items-center justify-center transition-all ${hasOpenWindow ? "w-14 h-14" : "w-16 h-16 md:w-20 md:h-20"}`}>
                   <img src="/photo-profil.jpg" alt="Sara Yeo" className="w-full h-full object-cover" />
                 </div>
               </div>
 
               <div className="relative mb-8 w-full">
-                <p className="w-full rounded-2xl border-2 border-slate-900 bg-white px-4 py-2.5 text-xs md:text-sm font-bold text-slate-800 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] text-center">
+                <p className={`w-full rounded-2xl border-2 border-slate-900 bg-white px-5 py-3 font-bold text-slate-800 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] text-center transition-all ${hasOpenWindow ? "text-xs" : "text-sm md:text-base"}`}>
                   Je transforme les insights en résultats mesurables
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-2.5 w-full mt-2">
-                <div className="relative bg-violet-100 border-2 border-slate-900 p-2 md:p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-2">
+              <div className="grid grid-cols-3 gap-3 w-full mt-2">
+                <div className="relative bg-violet-100 border-2 border-slate-900 p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-2">
                   <p className="text-[9px] md:text-[10px] uppercase tracking-wider font-black text-slate-600">Activation</p>
-                  <p className="text-base md:text-lg font-black text-slate-900 mt-0.5">+18%</p>
+                  <p className="text-base md:text-xl font-black text-slate-900 mt-0.5">+18%</p>
                 </div>
-                <div className="relative bg-emerald-100 border-2 border-slate-900 p-2 md:p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rotate-3">
+                <div className="relative bg-emerald-100 border-2 border-slate-900 p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rotate-3">
                   <p className="text-[9px] md:text-[10px] uppercase tracking-wider font-black text-slate-600">Time-To-Value</p>
-                  <p className="text-base md:text-lg font-black text-slate-900 mt-0.5">-22%</p>
+                  <p className="text-base md:text-xl font-black text-slate-900 mt-0.5">-22%</p>
                 </div>
-                <div className="relative bg-pink-100 border-2 border-slate-900 p-2 md:p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-1">
+                <div className="relative bg-pink-100 border-2 border-slate-900 p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-1">
                   <p className="text-[9px] md:text-[10px] uppercase tracking-wider font-black text-slate-600">ARPA</p>
-                  <p className="text-base md:text-lg font-black text-slate-900 mt-0.5">+11%</p>
+                  <p className="text-base md:text-xl font-black text-slate-900 mt-0.5">+11%</p>
                 </div>
               </div>
             </div>
@@ -452,6 +442,6 @@ export default function Desktop() {
           </div>
         </motion.div>
       )}
-    </motion.main>
+    </main>
   );
 }
