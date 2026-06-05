@@ -37,6 +37,7 @@ export default function Desktop() {
 
   // --- GESTION DE LA MUSIQUE LOFI ---
   const [isMuted, setIsMuted] = useState(true);
+  const [isMusicOpen, setIsMusicOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // --- REFERENCES POUR LA GESTION DU DECOUPLAGE DU MENU ---
@@ -139,7 +140,7 @@ export default function Desktop() {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.12, delayChildren: 0.2 }
+      transition: { staggerChildren: 0.18, delayChildren: 0.2 }
     }
   };
 
@@ -277,8 +278,11 @@ export default function Desktop() {
                   <FolderIcon label="Expérience" onOpen={() => ds.open("experience")} />
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="absolute top-6 right-[10%] md:right-[18%] pointer-events-auto transform scale-110 md:scale-125 transition-all duration-300 hover:-translate-y-1">
-                  <FolderIcon label="CV" onOpen={() => ds.open("resume")} />
+                <motion.div variants={itemVariants} className="absolute top-24 right-[10%] md:right-[18%] pointer-events-auto transform scale-110 md:scale-125 transition-all duration-300 hover:-translate-y-1">
+                  <div onClick={() => ds.open("resume")} className="cursor-pointer flex flex-col items-center">
+                    <div className="text-4xl">📄</div>
+                      <span className="text-xs font-bold mt-1">CV Sara.pdf</span>
+                    </div>
                 </motion.div>
                 
                 <motion.div variants={itemVariants} className="absolute top-[48%] right-[5%] md:right-[12%] pointer-events-auto transform scale-110 md:scale-125 transition-all duration-300 hover:-translate-y-1">
@@ -366,6 +370,56 @@ export default function Desktop() {
           </div>
         </motion.div>
       )}
+  {/* ================= MUSIC SIDEBAR ================= */}
+  <AnimatePresence>
+  {isMusicOpen && (
+    <motion.div
+      initial={{ x: 120, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: 120, opacity: 0 }}
+      transition={{ type: "spring", stiffness: 120, damping: 18 }}
+      className="fixed right-20 bottom-28 w-72 bg-white border-6 border-slate-900 rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-4 z-50"
+    >
+      <div className="flex items-center justify-between mb-3">
+        <span className="font-black text-xs uppercase text-slate-700">Now Playing</span>
+        <button
+          onClick={() => setIsMusicOpen(false)}
+          className="text-xs font-black"
+        >
+          ✕
+        </button>
+      </div>
+      <div className="bg-indigo-50 border-2 border-slate-900 rounded-xl p-3 text-center">
+        <p className="text-xs font-bold text-slate-600">Lofi Radio</p>
+        <p className="text-sm font-black text-slate-900 mt-1">
+          Chill Beats
+        </p>
+      </div>
+      <div className="flex items-center justify-center gap-4 mt-4">
+        <button
+          onClick={toggleMute}
+          className="bg-indigo-900 text-white px-4 py-2 rounded-xl border-2 border-slate-900 text-xs font-black"
+        >
+          {isMuted ? "Play" : "Pause"}
+        </button>
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
+{/* MUSIC FLOATING BUTTON */}
+<motion.button
+  onClick={() => setIsMusicOpen(!isMusicOpen)}
+  whileHover={{ scale: 1.1 }}
+  whileTap={{ scale: 0.95 }}
+  className="fixed bottom-10 right-24 z-50 w-20 h-16 rounded-full bg-green-600 border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-white text-xl"
+>
+  🎧
+</motion.button>
+{/*<motion.div
+  animate={!isMuted ? { scale: [1, 1.05, 1] } : {}}
+  transition={{ repeat: Infinity, duration: 1.2 }}
+></motion.div>*/}
 
       {/* ================= BARRE DES TÂCHES (TASKBAR) ANIMÉE ================= */}
       {!isLoading && (
@@ -431,10 +485,6 @@ export default function Desktop() {
             className="whitespace-nowrap rounded-xl bg-pink-500 border-2 border-slate-900 px-4 py-1.5 text-xs font-black uppercase text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition hover:bg-pink-600"
           >
             Contacter
-          </button>
-
-          <button onClick={toggleMute} className="rounded-xl border-2 border-slate-200 bg-slate-50 p-1.5 text-xs font-bold hover:bg-slate-100 min-w-[32px] h-[32px]">
-            {isMuted ? "🔇" : "🎵"}
           </button>
 
           <div className="hidden sm:block text-xs font-mono font-bold text-slate-700 bg-slate-100 border-2 border-slate-200 rounded-lg px-2 py-1 text-center min-w-[85px]">
