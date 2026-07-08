@@ -1,7 +1,10 @@
 :root {
    --color-ink: #1f2937;
-    --color-blue-500: #4f8cff;
+    --color-blue-500: #3e7ae8;
     --color-blue-600: #04112d;
     --color-coral-400: #ff7f66; }
 
 body { background: var(--color-bg); color: var(--color-ink); }
+.skill-badge {
+  @apply px-2 py-1 text-xs font-bold bg-slate-100 border-2 border-slate-900 rounded-md;
+}

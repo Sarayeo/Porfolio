@@ -7,12 +7,12 @@ export default function About() {
       <section className="rounded-2xl border-4 border-slate-900 bg-white p-6 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-xl">👋</span>
-          <h3 className="text-xl font-black text-slate-900 uppercase tracking-wide">Hello World</h3>
+          <h3 className="text-xl font-black text-slate-900 uppercase tracking-wide">Hello tout le monde </h3>
         </div>
         
         <p className="leading-relaxed text-sm md:text-base text-slate-700">
           Product Manager / Product Owner avec une approche résolument orientée <span className="bg-sky-200 px-1 py-0.5 rounded font-bold text-slate-900">impact, discovery et delivery</span>. 
-          Mon super-pouvoir ? Transformer le flou artistique des besoins utilisateurs en fonctionnalités claires, testables et hautement mesurables. 
+          j'adore transformer le flou des besoins utilisateurs en fonctionnalités claires, testables et mesurables. 
           Je crée des ponts solides entre la vision business, la data et les équipes de dev pour maximiser la valeur à chaque sprint.
         </p>
 
@@ -20,7 +20,7 @@ export default function About() {
         <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t-2 border-dashed border-slate-200">
           <span className="text-xs bg-slate-100 border border-slate-300 text-slate-700 px-2.5 py-1 rounded-md font-bold">#UserCentric</span>
           <span className="text-xs bg-slate-100 border border-slate-300 text-slate-700 px-2.5 py-1 rounded-md font-bold">#DataDriven</span>
-          <span className="text-xs bg-slate-100 border border-slate-300 text-slate-700 px-2.5 py-1 rounded-md font-bold">#AgileMindset</span>
+          <span className="text-xs bg-slate-100 border border-slate-300 text-slate-700 px-2.5 py-1 rounded-md font-bold">#Agile</span>
         </div>
       </section>
 
@@ -66,6 +66,7 @@ export default function About() {
           "Pas de feature sans metric, pas de metric sans apprentissage."
         </p>
       </section>
+      
     </div>
   );
 }

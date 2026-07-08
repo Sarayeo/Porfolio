@@ -4,9 +4,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 const tabs = [
-  { id: "onboarding", label: "Onboarding" },
-  { id: "feature", label: "Feature 0→1" },
-  { id: "pricing", label: "Pricing" },
+  { id: "hard", label: "Compétences techniques" },
+  { id: "product", label: "Produit" },
+  { id: "soft", label: "Soft skills" },
 ] as const;
 
 export default function CaseStudies() {

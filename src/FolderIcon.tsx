@@ -83,7 +83,7 @@ export default function FolderIcon({ label, onOpen }: FolderIconProps) {
       </div>
 
       {/* ================= LABEL TEXTE DU DOSSIER ================= */}
-      <span className="mt-1 px-2 py-0.5 text-xs font-bold text-[#2b1f15] tracking-wide text-center font-sans select-none max-w-[130px] transition-colors group-hover:text-black">
+      <span className="mt-1 px-2 py-0.5 text-xs font-bold text-[#000000] tracking-wide text-center font-sans select-none max-w-[130px] transition-colors group-hover:text-black">
         {label}
       </span>
     </button>
