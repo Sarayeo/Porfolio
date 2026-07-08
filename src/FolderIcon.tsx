@@ -14,7 +14,7 @@ export default function FolderIcon({ label, onOpen }: FolderIconProps) {
       {/* ================= CONTENEUR DU DOSSIER ET DE SON OMBRE RÉTRO ================= */}
       <div className="relative w-24 h-20 flex items-center justify-center transition-transform duration-200 ease-out group-hover:scale-105 group-active:scale-95">
         
-        {/* L'ombre portée diffuse en arrière-plan (copie conforme de l'ombre au sol de ton image) */}
+        
         <div className="absolute bottom-1 right-[-8px] w-[85%] h-[40%] bg-slate-900/15 rounded-[100%] blur-[6px] transform rotate-3 pointer-events-none transition-opacity group-hover:opacity-80" />
 
         {/* ================= REPRODUCTION VECTORIELLE DU DOSSIER ================= */}

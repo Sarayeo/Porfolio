@@ -4,9 +4,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 const tabs = [
-  { id: "hard", label: "Compétences techniques" },
-  { id: "product", label: "Produit" },
-  { id: "soft", label: "Soft skills" },
+  { id: "hard", label: "BLOOP" },
+  { id: "product", label: "KIRBDEN" },
+  { id: "soft", label: "LEON'ART" },
 ] as const;
 
 export default function CaseStudies() {
@@ -43,8 +43,10 @@ export default function CaseStudies() {
           <section className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 md:col-span-2">
             <h3 className="mb-1 font-extrabold text-blue-950">Contexte</h3>
             <p className="text-sm text-slate-700 leading-relaxed">
-              Baisse d’activation J7. Objectif: +15% d’ici Q3. Contraintes:
-              dette technique onboarding.
+              création application MAO (musique assistée par ordinateur). 
+              Objectif: 17000 Utilisateurs à N+3 du lancement. 
+              Contraintes:
+              Géants du marché très présents, terrain inconu autour des licences musicales , droit d'auteurs et soucis de gestion du stockage.
             </p>
 
             <h3 className="mt-4 mb-1 font-extrabold text-blue-950">Process</h3>
