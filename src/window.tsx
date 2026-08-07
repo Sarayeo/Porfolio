@@ -36,9 +36,9 @@ export default function Window({
       exit={{ scale: 0.95, opacity: 0, y: 15 }}
       transition={{ type: "spring", stiffness: 220, damping: 20 }}
       className={[
-        "w-full max-w-2xl h-[min(70vh,620px)]",
+        "w-full max-w-2.5xl h-[min(75vh,710px)]",
         "rounded-3xl border-4 flex flex-col overflow-hidden",
-        isActive ? "border-blue-900 shadow-[8px_8px_0px_0px_rgba(30,58,138,1)]" : "border-slate-700 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]",
+        isActive ? "border-violet-900 shadow-[8px_8px_0px_0px_rgba(30,58,138,1)]" : "border-slate-700 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]",
         "bg-white z-20"
       ].filter(Boolean).join(" ")}
       role="dialog"
@@ -46,7 +46,7 @@ export default function Window({
     >
       {/* Window Header Titlebar */}
       <div 
-        className="h-14 px-5 flex items-center justify-between border-b-4 border-blue-900 shrink-0 select-none"
+        className="h-14 px-5 flex items-center justify-between border-b-4 border-violet-900 shrink-0 select-none"
         style={{ background: "linear-gradient(180deg, #dcebff, #cfe2ff)" }}
       >
         <div className="flex items-center gap-3">

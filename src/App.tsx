@@ -316,7 +316,7 @@ export default function Desktop() {
               <div className="flex items-center justify-between w-full gap-5 mb-6">
                 <div className="text-left">
                   <h1 className={`font-black tracking-tight text-slate-900 transition-all ${hasOpenWindow ? "text-2xl" : "text-3xl md:text-4xl"}`}>Sara Yeo</h1>
-                  <h2 className={`font-extrabold text-indigo-600 mt-1 uppercase tracking-wide transition-all ${hasOpenWindow ? "text-xs" : "text-sm md:text-base"}`}>Product Manager / Product Owner</h2>
+                  <h2 className={`font-extrabold text-indigo-600 mt-1 uppercase tracking-wide transition-all ${hasOpenWindow ? "text-xs" : "text-sm md:text-base"}`}>Product Owner / Product Manager</h2>
                 </div>
                 {/* <div className={`rounded-full border-4 border-indigo-950 bg-indigo-50 overflow-hidden shadow-md shrink-0 flex items-center justify-center transition-all ${hasOpenWindow ? "w-14 h-14" : "w-16 h-16 md:w-20 md:h-20"}`}>
                   <img src="/photo-profil.jpg" alt="Sara Yeo" className="w-full h-full object-cover" />
@@ -349,7 +349,19 @@ export default function Desktop() {
               {hasOpenWindow && (
                 <Window
                   id={currentActiveApp}
-                  title={currentActiveApp === 'cases' ? 'Case_Studies' : currentActiveApp}
+                  title={
+                    currentActiveApp === 'cases'
+                      ? 'étude de cas'
+                      : currentActiveApp === 'resume'
+                        ? 'CV'
+                        : currentActiveApp === 'about'
+                          ? 'à propos'
+                          : currentActiveApp === 'experience'
+                            ? 'expérience'
+                            : currentActiveApp === 'skills'
+                              ? 'compétences'
+                              : 'contact'
+                  }
                   isActive={true}
                   onClose={() => ds.close(currentActiveApp)}
                   onFocus={() => {}}
@@ -375,7 +387,7 @@ export default function Desktop() {
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 120, opacity: 0 }}
       transition={{ type: "spring", stiffness: 120, damping: 18 }}
-      className="fixed right-20 bottom-28 w-72 bg-white border-6 border-slate-900 rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-4 z-50"
+      className="fixed right-20 bottom-28 w-70 bg-white border-6 border-slate-900 rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-4 z-50"
     >
       <div className="flex items-center justify-between mb-3">
         <span className="font-black text-xs uppercase text-slate-700">Now Playing</span>
@@ -409,7 +421,7 @@ export default function Desktop() {
   onClick={() => setIsMusicOpen(!isMusicOpen)}
   whileHover={{ scale: 1.1 }}
   whileTap={{ scale: 0.95 }}
-  className="fixed bottom-10 right-24 z-50 w-20 h-16 rounded-full bg-green-600 border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-white text-xl"
+  className="fixed bottom-10 right-24 z-50 w-16 h-16 rounded-full bg-green-700 border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-white text-xl"
 >
   🎧
 </motion.button>
