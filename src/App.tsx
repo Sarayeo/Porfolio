@@ -21,6 +21,8 @@ const APPS_LIST = [
   { id: "contact", label: "Contact", icon: "📬" },
 ];
 
+const BOOKING_URL = "https://calendar.app.google/nhgLfn6C8yLL2LhL8";
+
 export default function Desktop() {
   const ds = useDesktopState();
   const hasOpenWindow = ds.openApps.length > 0;
@@ -39,6 +41,9 @@ export default function Desktop() {
   const [isMuted, setIsMuted] = useState(true);
   const [isMusicOpen, setIsMusicOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // --- GESTION DE LA RÉSERVATION D'APPEL ---
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   // --- REFERENCES POUR LA GESTION DU DECOUPLAGE DU MENU ---
   const startMenuRef = useRef<HTMLDivElement>(null);
@@ -379,6 +384,71 @@ export default function Desktop() {
           </div>
         </motion.div>
       )}
+
+      {/* ================= BOOKING MODAL ================= */}
+      <AnimatePresence>
+        {isBookingOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-100 flex items-center justify-center bg-black/40 p-4"
+            onClick={() => setIsBookingOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 150, damping: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md bg-white border-4 border-slate-900 rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col"
+            >
+              <div className="bg-indigo-950 px-4 py-3 flex items-center justify-between text-white shrink-0">
+                <span className="text-xs font-black uppercase tracking-wide">
+                   Réserver un appel avec Sara
+                </span>
+                <button
+                  onClick={() => setIsBookingOpen(false)}
+                  className="text-sm font-black hover:text-pink-300 transition"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="p-6 flex flex-col items-center text-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-indigo-50 border-2 border-slate-900 flex items-center justify-center text-3xl">
+                  🗓️
+                </div>
+
+                <div>
+                  <h3 className="font-black text-slate-900 text-base mb-1">
+                    On planifie un échange ?
+                  </h3>
+                  <p className="text-xs font-bold text-slate-500 leading-relaxed">
+                    Choisis un créneau qui t'arrange, l'appel se fera automatiquement
+                    sur Google Meets. Nous recevrons tout les deux la confirmation .
+                  </p>
+                </div>
+
+                <a
+                  href={BOOKING_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsBookingOpen(false)}
+                  className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-black uppercase text-xs rounded-xl border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all"
+                >
+                  Ouvrir le calendrier →
+                </a>
+
+                <p className="text-[10px] font-bold text-slate-400">
+                  ouverture nouvel onglet
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
   {/* ================= MUSIC SIDEBAR ================= */}
   <AnimatePresence>
   {isMusicOpen && (
@@ -476,7 +546,7 @@ export default function Desktop() {
               isStartMenuOpen ? "bg-slate-800" : "bg-indigo-900 hover:bg-indigo-950"
             }`}
           >
-            🏢 Start
+             Start
           </button>
 
           <div className="relative flex-1">
@@ -490,10 +560,10 @@ export default function Desktop() {
           </div>
 
           <button 
-            onClick={() => { window.location.href = "mailto:yeokpeusseusarafiela@gmail.com"; }}
+            onClick={() => setIsBookingOpen(true)}
             className="whitespace-nowrap rounded-xl bg-pink-500 border-2 border-slate-900 px-4 py-1.5 text-xs font-black uppercase text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition hover:bg-pink-600"
           >
-            Contacter
+             Réserver un appel
           </button>
 
           <div className="hidden sm:block text-xs font-mono font-bold text-slate-700 bg-slate-100 border-2 border-slate-200 rounded-lg px-2 py-1 text-center min-w-[85px]">

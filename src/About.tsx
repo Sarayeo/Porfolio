@@ -37,7 +37,7 @@ export default function About() {
           <button
             key={v.id}
             onClick={() => setView(v.id)}
-            className={`px-4 py-2 font-bold text-sm rounded-t-xl transition-all duration-150 -mb-[1px] border-2 border-b-0 ${
+            className={`px-4 py-2 font-bold text-sm rounded-t-xl transition-all duration-150 -mb-px border-2 border-b-0 ${
               view === v.id
                 ? "border-blue-900 bg-blue-900 text-white"
                 : "border-transparent text-slate-500 hover:text-slate-800"
@@ -66,9 +66,9 @@ export default function About() {
               </div>
 
               <p className="leading-relaxed text-sm md:text-base text-slate-700">
-                Product Manager / Product Owner avec une approche résolument orientée{" "}
-                <span className="bg-sky-200 px-1 py-0.5 rounded font-bold text-slate-900">impact, discovery et delivery</span>.
-                J'adore transformer le flou des besoins utilisateurs en fonctionnalités claires et mesurables.
+                En tant que Product Manager / Product Owner avec une approche résolument orientée{" "}
+                <span className="bg-sky-200 px-1 py-0.5 rounded font-bold text-slate-900">impact, discovery et delivery</span>,
+                j'adore transformer le flou des besoins utilisateurs en fonctionnalités claires et mesurables.
                 Je crée des ponts solides entre la vision , les données et les équipes de dev pour maximiser la valeur à chaque sprint.
               </p>
 
@@ -130,7 +130,7 @@ export default function About() {
               <p className="leading-relaxed text-sm md:text-base text-slate-700">
                 En dehors du produit, je dessine. c'est une passion que j'entretiens depuis longtemps, à retrouver sur{" "}
                 <span className="bg-violet-200 px-1 py-0.5 rounded font-bold text-slate-900">@not_arting</span>.
-                Ce goût pour l'art nourrit ma façon de penser au quotidien : le sens du détail, et une sensibilité visuelle que j'essaie de ramener jusque dans mon travail.
+                Ce goût pour l'art nourrit ma façon de penser au quotidien : mon sens du détail, et ma sensibilité visuelle sont des éléments que j'essaie de ramener jusque dans mon travail.
               </p>
             </section>
 

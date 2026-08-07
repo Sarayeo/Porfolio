@@ -2,9 +2,19 @@
    --color-ink: #1f2937;
     --color-blue-500: #3e7ae8;
     --color-blue-600: #04112d;
-    --color-coral-400: #ff7f66; }
+    --color-coral-400: #ff7f66;
+}
 
-body { background: var(--color-bg); color: var(--color-ink); }
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
 .skill-badge {
-  @apply px-2 py-1 text-xs font-bold bg-slate-100 border-2 border-slate-900 rounded-md;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background-color: #f1f5f9;
+  border: 2px solid #0f172a;
+  border-radius: 0.375rem;
 }

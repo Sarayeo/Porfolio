@@ -104,7 +104,7 @@ export default function CaseStudies() {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`px-4 py-2 font-bold text-sm rounded-t-xl transition-all duration-150 -mb-[1px] border-2 border-b-0 ${
+            className={`px-4 py-2 font-bold text-sm rounded-t-xl transition-all duration-150 -mb-px border-2 border-b-0 ${
               tab === t.id
                 ? "border-blue-900 bg-blue-900 text-white"
                 : "border-transparent text-slate-500 hover:text-slate-800"
