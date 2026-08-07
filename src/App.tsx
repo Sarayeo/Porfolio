@@ -44,7 +44,7 @@ export default function Desktop() {
   const startMenuRef = useRef<HTMLDivElement>(null);
   const startButtonRef = useRef<HTMLButtonElement>(null);
 
-  // 1. Initialisation de l'audio au montage
+
   useEffect(() => {
     const audio = new Audio("/mondamusic-lofi-lofi-chill-lofi-girl-491690.mp3");
     audio.loop = true;
@@ -56,7 +56,7 @@ export default function Desktop() {
     };
   }, []);
 
-  // 2. Gestion de la barre de progression (seulement après le clic d'entrée)
+  
   useEffect(() => {
     if (!hasInteracted) return;
 
@@ -108,7 +108,7 @@ export default function Desktop() {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Fermeture du menu démarrer au clic extérieur (en excluant le bouton Start)
+  
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -135,7 +135,7 @@ export default function Desktop() {
     }
   };
 
-  // Variantes d'animation pour l'apparition en cascade (Stagger effect)
+  
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -318,29 +318,26 @@ export default function Desktop() {
                   <h1 className={`font-black tracking-tight text-slate-900 transition-all ${hasOpenWindow ? "text-2xl" : "text-3xl md:text-4xl"}`}>Sara Yeo</h1>
                   <h2 className={`font-extrabold text-indigo-600 mt-1 uppercase tracking-wide transition-all ${hasOpenWindow ? "text-xs" : "text-sm md:text-base"}`}>Product Manager / Product Owner</h2>
                 </div>
-                <div className={`rounded-full border-4 border-indigo-950 bg-indigo-50 overflow-hidden shadow-md shrink-0 flex items-center justify-center transition-all ${hasOpenWindow ? "w-14 h-14" : "w-16 h-16 md:w-20 md:h-20"}`}>
+                {/* <div className={`rounded-full border-4 border-indigo-950 bg-indigo-50 overflow-hidden shadow-md shrink-0 flex items-center justify-center transition-all ${hasOpenWindow ? "w-14 h-14" : "w-16 h-16 md:w-20 md:h-20"}`}>
                   <img src="/photo-profil.jpg" alt="Sara Yeo" className="w-full h-full object-cover" />
-                </div>
+                </div> */}
               </div>
 
               <div className="relative mb-8 w-full">
                 <p className={`w-full rounded-2xl border-2 border-slate-900 bg-white px-5 py-3 font-bold text-slate-800 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] text-center transition-all ${hasOpenWindow ? "text-xs" : "text-sm md:text-base"}`}>
-                  Je transforme les insights en résultats mesurables
+                  J'exploite les données pour atteindre des résultats tangibles
                 </p>
               </div>
 
               <div className="grid grid-cols-3 gap-3 w-full mt-2">
                 <div className="relative bg-violet-100 border-2 border-slate-900 p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-2">
-                  <p className="text-[9px] md:text-[10px] uppercase tracking-wider font-black text-slate-600">Activation</p>
-                  <p className="text-base md:text-xl font-black text-slate-900 mt-0.5">+18%</p>
+                  <p className="text-base md:text-xl font-black text-slate-900 mt-2">Créativité</p>
                 </div>
                 <div className="relative bg-emerald-100 border-2 border-slate-900 p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rotate-3">
-                  <p className="text-[9px] md:text-[10px] uppercase tracking-wider font-black text-slate-600">Time-To-Value</p>
-                  <p className="text-base md:text-xl font-black text-slate-900 mt-0.5">-22%</p>
+                  <p className="text-base md:text-xl font-black text-slate-900 mt-2">Time-To-Value</p>
                 </div>
                 <div className="relative bg-pink-100 border-2 border-slate-900 p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-1">
-                  <p className="text-[9px] md:text-[10px] uppercase tracking-wider font-black text-slate-600">ARPA</p>
-                  <p className="text-base md:text-xl font-black text-slate-900 mt-0.5">+11%</p>
+                  <p className="text-base md:text-xl font-black text-slate-900 mt-2">Efficacité</p>
                 </div>
               </div>
             </div>

@@ -15,13 +15,13 @@ const tabs: { id: TabId; label: string }[] = [
 const caseStudies: Record<TabId, any> = {
   bloop: {
     context: `Création d'une application MAO (musique assistée par ordinateur).
-Objectif : 17 000 utilisateurs à N+3 du lancement.
+Objectif : 10 000 utilisateurs à N+3 du lancement.
 Contraintes : géants du marché très présents, terrain inconnu autour des licences musicales, du droit d'auteur et de la gestion du stockage.`,
     process: [
-      "Discovery : 15 interviews, funnel analytics (Amplitude)",
+      "Discovery : interviews, funnel analytics (Amplitude)",
       "Priorisation : RICE (top 3 opportunités)",
-      "Expérimentation : A/B, smoke tests",
-      "Delivery : 3 sprints, release pilote",
+      "Expérimentation : Smoke tests,A/B testing ",
+      "Delivery : 5 sprints, release pilote",
     ],
     media: {
       type: "image",
@@ -29,7 +29,7 @@ Contraintes : géants du marché très présents, terrain inconnu autour des lic
       alt: "Aperçu de l'application Bloop",
     },
     actions: [
-      { label: "Télécharger les docs récapitulatifs", href: "/docs/bloop-recap.pdf", variant: "primary" },
+      //{ label: "Télécharger les docs récapitulatifs", href: "/docs/bloop-recap.pdf", variant: "primary" },
       { label: "Accéder à Bloop", href: "https://bloop-on.cloud/", variant: "secondary" },
     ],
   },
@@ -45,7 +45,7 @@ Travail de A à Z, de la maquette Figma à l'intégration finale.`,
     },
     actions: [
       { label: "Voir les maquettes Figma", href: "https://www.figma.com/design/xgoh95UxajM9WfiYeK2nkn/Travail-Design-system?node-id=9-105&t=CdmUQqAlethDhWnx-1", variant: "primary" },
-      { label: "Voir le projet en ligne", href: "#", variant: "secondary" },
+      //{ label: "Voir le projet en ligne", href: "#", variant: "secondary" },
     ],
   },
 
