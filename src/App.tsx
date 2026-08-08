@@ -268,7 +268,7 @@ export default function Desktop() {
             {!hasOpenWindow && (
               <div className="absolute inset-0 pointer-events-none">
                 <motion.div variants={itemVariants} className="absolute top-6 left-[10%] md:left-[18%] pointer-events-auto transform scale-110 md:scale-125 transition-all duration-300 hover:-translate-y-1">
-                  <FolderIcon label="À Propos" onOpen={() => ds.open("about")} />
+                  <FolderIcon label="À propos" onOpen={() => ds.open("about")} />
                 </motion.div>
                 
                 <motion.div variants={itemVariants} className="absolute top-[38%] left-[5%] md:left-[10%] pointer-events-auto transform scale-110 md:scale-125 transition-all duration-300 hover:-translate-y-1">
@@ -280,7 +280,7 @@ export default function Desktop() {
                 </motion.div>
 
                 <motion.div variants={itemVariants} className="absolute top-2 left-1/2 -translate-x-1/2 pointer-events-auto transform scale-110 md:scale-125 transition-all duration-300 hover:-translate-y-1">
-                  <FolderIcon label="Expérience" onOpen={() => ds.open("experience")} />
+                  <FolderIcon label="Expériences" onOpen={() => ds.open("experience")} />
                 </motion.div>
 
                 <motion.div variants={itemVariants} className="absolute top-24 right-[10%] md:right-[18%] pointer-events-auto transform scale-110 md:scale-125 transition-all duration-300 hover:-translate-y-1">
@@ -310,10 +310,10 @@ export default function Desktop() {
           >
             <div className="bg-indigo-950 px-5 py-3.5 flex items-center justify-between text-indigo-100 border-b-2 border-indigo-950">
               <span className="text-xs font-mono tracking-wider font-bold opacity-90">C:/PORTFOLIO/home</span>
-              <div className="flex gap-1.5 opacity-60">
-                <div className="w-3 h-3 rounded-full border-2 border-white bg-transparent" />
-                <div className="w-3 h-3 rounded-full border-2 border-white bg-transparent" />
-                <div className="w-3 h-3 rounded-full border-2 border-white bg-transparent" />
+              <div className="flex gap-1.5 opacity-80">
+                <div className="w-3 h-3 rounded-full border-2 border-white bg-red-600" />
+                <div className="w-3 h-3 rounded-full border-2 border-white bg-yellow-600" />
+                <div className="w-3 h-3 rounded-full border-2 border-white bg-green-600" />
               </div>
             </div>
 
@@ -409,7 +409,7 @@ export default function Desktop() {
                 </span>
                 <button
                   onClick={() => setIsBookingOpen(false)}
-                  className="text-sm font-black hover:text-pink-300 transition"
+                  className="text-sm font-black hover:text-pink-300 transition cursor-pointer"
                 >
                   ✕
                 </button>
@@ -463,7 +463,7 @@ export default function Desktop() {
         <span className="font-black text-xs uppercase text-slate-700">Now Playing</span>
         <button
           onClick={() => setIsMusicOpen(false)}
-          className="text-xs font-black"
+          className="text-xs font-black cursor-pointer"
         >
           ✕
         </button>
@@ -477,7 +477,7 @@ export default function Desktop() {
       <div className="flex items-center justify-center gap-4 mt-4">
         <button
           onClick={toggleMute}
-          className="bg-indigo-900 text-white px-4 py-2 rounded-xl border-2 border-slate-900 text-xs font-black"
+          className="bg-indigo-900 text-white px-4 py-2 rounded-xl border-2 border-slate-900 text-xs font-black cursor-pointer"
         >
           {isMuted ? "Play" : "Pause"}
         </button>
@@ -491,7 +491,7 @@ export default function Desktop() {
   onClick={() => setIsMusicOpen(!isMusicOpen)}
   whileHover={{ scale: 1.1 }}
   whileTap={{ scale: 0.95 }}
-  className="fixed bottom-10 right-24 z-50 w-16 h-16 rounded-full bg-green-700 border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-white text-xl"
+  className="fixed bottom-10 right-24 z-50 w-16 h-16 rounded-full bg-green-700 border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-white text-xl cursor-pointer"
 >
   🎧
 </motion.button>
@@ -519,7 +519,7 @@ export default function Desktop() {
                 transition={{ duration: 0.15 }}
                 className="absolute bottom-16 left-0 w-64 bg-white border-4 border-slate-900 rounded-2xl p-3 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-1 z-50"
               >
-                <div className="bg-indigo-900 text-white font-black text-xs px-3 py-2 rounded-xl mb-2 uppercase tracking-wide">
+                <div className="bg-indigo-900 text-white font-black text-xs px-3 py-2 rounded-xl mb-2 uppercase tracking-wide cursor-pointer">
                   Menu Principal
                 </div>
                 {APPS_LIST.map((app) => (
@@ -561,7 +561,7 @@ export default function Desktop() {
 
           <button 
             onClick={() => setIsBookingOpen(true)}
-            className="whitespace-nowrap rounded-xl bg-pink-500 border-2 border-slate-900 px-4 py-1.5 text-xs font-black uppercase text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition hover:bg-pink-600"
+            className="whitespace-nowrap rounded-xl bg-pink-500 border-2 border-slate-900 px-4 py-1.5 text-xs font-black uppercase text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition hover:bg-pink-600 cursor-pointer"
           >
              Réserver un appel
           </button>

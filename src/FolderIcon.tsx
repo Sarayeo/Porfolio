@@ -19,12 +19,11 @@ export default function FolderIcon({ label, onOpen }: FolderIconProps) {
 
         {/* ================= REPRODUCTION VECTORIELLE DU DOSSIER ================= */}
         <svg 
-          viewBox="0 0 120 90" 
+          viewBox="0 0 120 80" 
           className="w-full h-full drop-shadow-[0_2px_3px_rgba(0,0,0,0.05)]"
           fill="none" 
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Définition des dégradés exacts de ton modèle */}
           <defs>
             {/* Rabat arrière (Couleur Saumon / Terracotta claire) */}
             <linearGradient id="backTabGrad" x1="0%" y1="0%" x2="0%" y2="100%">
