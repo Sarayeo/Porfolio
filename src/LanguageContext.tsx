@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { translations, type Language } from "./translations";
+import { translations, type Language } from "./Translations";
 
 type LanguageContextType = {
   language: Language;

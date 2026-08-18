@@ -11,7 +11,7 @@ import CaseStudies from "./CaseStudies";
 import Skills from "./skills";
 import Resume from "./Resume";
 import Contact from "./Contact";
-import { translations, type Language } from "./translations";
+import { translations, type Language } from "./Translations";
 
 const BOOKING_URL = "https://calendar.app.google/nhgLfn6C8yLL2LhL8";
 
@@ -415,7 +415,7 @@ export default function Desktop() {
             y: [0, -80, 40, 0],
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[10%] left-[30%] w-[600px] h-[600px] rounded-full bg-pink-400/20 blur-3xl"
+          className="absolute top-[10%] left-[30%] w-150 h-150 rounded-full bg-pink-400/20 blur-3xl"
         />
 
         <motion.div
@@ -429,7 +429,7 @@ export default function Desktop() {
             ease: "easeInOut",
             delay: 2,
           }}
-          className="absolute bottom-[10%] right-[25%] w-[500px] h-[500px] rounded-full bg-indigo-500/15 blur-3xl"
+          className="absolute bottom-[10%] right-[25%] w-125 h-125 rounded-full bg-indigo-500/15 blur-3xl"
         />
 
         <div className="absolute inset-0 top-0 h-[60vh]">
@@ -955,7 +955,7 @@ export default function Desktop() {
             {t.desktop.booking}
           </button>
 
-          <div className="hidden sm:block text-xs font-mono font-bold text-slate-700 bg-slate-100 border-2 border-slate-200 rounded-lg px-2 py-1 text-center min-w-[85px]">
+          <div className="hidden sm:block text-xs font-mono font-bold text-slate-700 bg-slate-100 border-2 border-slate-200 rounded-lg px-2 py-1 text-center min-w-21.25">
             🕒 {currentTime || "00:00:00"}
           </div>
         </motion.div>

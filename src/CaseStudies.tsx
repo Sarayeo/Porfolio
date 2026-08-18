@@ -2,7 +2,7 @@
 
 import { useState, type Key } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { translations, type Language } from "./translations";
+import { translations, type Language } from "./Translations";
 
 type TabId = "bloop" | "kirbden" | "pokedex" | "leonart";
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { translations, type Language } from "./translations";
+import { translations, type Language } from "./Translations";
 
 type ExpId = "suitus" | "bpce" | "lmp";
 

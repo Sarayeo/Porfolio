@@ -1,6 +1,6 @@
 "use client";
 
-import { translations, type Language } from "./translations";
+import { translations, type Language } from "./Translations";
 
 type ContactProps = {
   language: Language;
