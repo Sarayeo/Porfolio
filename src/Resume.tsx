@@ -37,7 +37,7 @@ export default function Resume() {
           Profil
         </h2>
         <p className="text-sm text-slate-800 leading-relaxed">
-          Cheffe de produit junior spécialisée en produits digitaux, avec une
+          Cheffe de Produit Junior spécialisée en produits digitaux, avec une
           forte appétence pour la transformation digitale. Expérience en cadrage
           d’offres, analyse des besoins métiers et pilotage de projets web &
           mobiles en environnement agile.
@@ -47,7 +47,7 @@ export default function Resume() {
       {/* EXPERIENCE */}
       <section className="mb-6">
         <h2 className="text-xs font-black uppercase text-slate-500 mb-3">
-          Expérience
+          Expériences
         </h2>
 
         <div className="space-y-4">
@@ -95,16 +95,16 @@ export default function Resume() {
 
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <p className="font-bold">Product</p>
+            <p className="font-bold">Produit</p>
             <p className="text-slate-700">
               Agile, Roadmap, Discovery, Analyse besoins
             </p>
           </div>
 
           <div>
-            <p className="font-bold">Tech</p>
+            <p className="font-bold">Technique</p>
             <p className="text-slate-700">
-              React, SQL, APIs, Figma, Jira
+              React, SQL, APIs, Design
             </p>
           </div>
         </div>
@@ -124,7 +124,8 @@ export default function Resume() {
 
       {/* FOOTER */}
       <div className="text-xs text-slate-400 mt-8">
-        📍 France · 📧 yeokpeusseusarafiela@gmail.com
+        📍 France · <a
+            href="mailto:yeokpeusseusarafiela@gmail.com">📧 yeokpeusseusarafiela@gmail.com</a>
       </div>
     </motion.div>
   );

@@ -12,9 +12,9 @@ const expTabs: { id: ExpId; label: string }[] = [
 
 const experiences: Record<ExpId, any> = {
   suitus: {
-    role: "Développeur Frontend — Stage",
-    period: "2 mois",
-    intro: `Arrivé chez SuitUS en tant que développeuse frontend, j'ai pris en charge la conception et l'intégration d'interfaces, tout en gardant un œil attentif sur la qualité et la fiabilité du travail livré.`,
+    role: "Développeuse Frontend — Stage",
+    period: "Mai 2023 – Juillet 2023",
+    intro: `Arrivée chez SuitUS en tant que développeuse frontend, j'ai pris en charge la conception et l'intégration d'interfaces, tout en gardant un œil attentif sur la qualité et la fiabilité du travail livré.`,
     missions: [
       "Conception de wireframes en lien direct avec les besoins business",
       "Intégration des wireframes validés dans l'application en React",
@@ -28,9 +28,9 @@ const experiences: Record<ExpId, any> = {
   },
 
   bpce: {
-    role: "Développeuse Power plateforme — Alternance",
+    role: "Développeuse Power Platform — Alternance",
     period: "Septembre 2023 – Août 2024",
-    intro: `Intégré à l'équipe innovation du groupe bancaire BPCE, j'ai découvert l'écosystème Power Platform, jusque-là inconnu pour moi, et m'y suis adapté rapidement pour contribuer à des projets transverses au sein du groupe.`,
+    intro: `Intégrée à l'équipe innovation du groupe bancaire BPCE, j'ai découvert l'écosystème Power Platform, jusque-là inconnu pour moi, et m'y suis adaptée rapidement pour contribuer à des projets transverses au sein du groupe.`,
     missions: [
       "Participation à des programmes d'intégration internes au groupe",
       "Accompagnement d'autres entités du groupe, aux côtés de mon mentor, dans la création d'applications sur Power Platform",
@@ -40,13 +40,13 @@ const experiences: Record<ExpId, any> = {
       title: "Reprendre le projet de mon mentor",
       text: `En fin de mission, j'ai été chargé de reprendre le projet initialement porté par mon mentor : le nettoyage de l'environnement de production du groupe. Un travail mené en coordination avec d'autres développeurs via Microsoft Teams, qui a constitué ma dernière mission au sein de l'équipe.`,
     },
-    skills: ["Power Platform", "Power Apps", "Power Automate", "Travail en équipe distribuée","design Figma"],
+    skills: ["Power Platform", "Power Apps", "Power Automate", "Travail en équipe distribuée","Design Figma"],
   },
 
   lmp: {
     role: "Junior Product Manager — Alternance",
     period: "Septembre 2024 – Août 2026",
-    intro: `À la Mutuelle Les Ménages Prévoyants, j'ai occupé un poste de junior product manager aux missions variées, entre création de nouveaux produits, suivi de la performance commerciale et garantie de la conformité réglementaire.`,
+    intro: `À la Mutuelle Les Ménages Prévoyants, j'ai occupé un poste de junior Product Manager aux missions variées, entre création de nouveaux produits, suivi de la performance commerciale et garantie de la conformité réglementaire.`,
     missions: [
       "Conception de nouveaux produits destinés à la commercialisation",
       "Suivi des KPI de vente des produits déjà en place",
@@ -56,7 +56,7 @@ const experiences: Record<ExpId, any> = {
     ],
     highlight: {
       title: "Une approche produit complète",
-      text: `Tout au long de ces missions, j'ai mené des benchmarks, animé des ateliers, assuré le suivi de produits, analysé des demandes clients, réalisé des études concurrentielles qualitatives et quantitatives, et travaillé sur des éléments de prévision budgétaire . J'ai donc eue à avoir une vision transverse du métier de product manager.`,
+      text: `Tout au long de ces missions, j'ai mené des benchmarks, animé des ateliers, assuré le suivi de produits, analysé des demandes clients, réalisé des études concurrentielles qualitatives et quantitatives, et travaillé sur des éléments de prévision budgétaire. J'ai donc eu à avoir une vision transverse du métier de Product Manager.`,
     },
     skills: ["Product Management", "Benchmark", "Analyse concurrentielle", "Prévision budgétaire", "Conformité mutualiste"],
   },

@@ -6,7 +6,7 @@ export default function Contact() {
       <section className="rounded-2xl border border-slate-200 bg-white p-5">
         <h3 className="text-lg font-bold text-slate-900">Contact</h3>
         <p className="mt-2 text-slate-700">
-          Disponible pour un poste , un échange réseau ou
+          Disponible pour un poste, un échange réseau ou
           une discussion autour d’un projet.
         </p>
 
@@ -18,7 +18,7 @@ export default function Contact() {
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5">
-        <h3 className="text-lg font-bold text-slate-900">Quick actions</h3>
+        <h3 className="text-lg font-bold text-slate-900">actions rapides</h3>
 
         <div className="mt-4 flex flex-col gap-3">
           <a

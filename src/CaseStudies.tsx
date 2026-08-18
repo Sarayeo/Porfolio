@@ -23,6 +23,7 @@ Contraintes : géants du marché très présents, terrain inconnu autour des lic
       "Expérimentation : Smoke tests,A/B testing ",
       "Delivery : 5 sprints, release pilote",
     ],
+    group: true,
     media: {
       type: "image",
       src: "/images/bloop-visu.png",
@@ -133,7 +134,7 @@ export default function CaseStudies() {
 
             {data.process && (
               <>
-                <h3 className="mt-4 mb-1 font-extrabold text-blue-950">Process</h3>
+                <h3 className="mt-4 mb-1 font-extrabold text-blue-950">Processus</h3>
                 <ol className="list-decimal space-y-1 pl-5 text-sm text-slate-700">
                   {data.process.map((step: string, i: number) => (
                     <li key={i}>{step}</li>

@@ -13,7 +13,7 @@ import Resume from "./Resume";
 import Contact from "./Contact";
 
 const APPS_LIST = [
-  { id: "about", label: "À Propos", icon: "👤" },
+  { id: "about", label: "À propos", icon: "👤" },
   { id: "experience", label: "Expérience", icon: "💼" },
   { id: "cases", label: "Études de cas", icon: "📊" },
   { id: "skills", label: "Compétences", icon: "🛠️" },
