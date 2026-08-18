@@ -13,12 +13,66 @@ import Resume from "./Resume";
 import Contact from "./Contact";
 
 const APPS_LIST = [
-  { id: "about", label: "À propos", icon: "👤" },
-  { id: "experience", label: "Expérience", icon: "💼" },
-  { id: "cases", label: "Études de cas", icon: "📊" },
-  { id: "skills", label: "Compétences", icon: "🛠️" },
-  { id: "resume", label: "CV", icon: "📄" },
-  { id: "contact", label: "Contact", icon: "📬" },
+   {
+    id: "about",
+    label: "À propos",
+    icon: "👤",
+    keywords: ["about", "profil", "présentation", "sara", "portfolio"],
+  },
+  {
+    id: "experience",
+    label: "Expérience",
+    icon: "💼",
+    keywords: [
+      "expérience",
+      "experience",
+      "product manager",
+      "product owner",
+      "pm",
+      "po",
+      "parcours",
+      "career",
+    ],
+  },
+  {
+    id: "cases",
+    label: "Études de cas",
+    icon: "📊",
+    keywords: [
+      "études de cas",
+      "etudes de cas",
+      "case study",
+      "case studies",
+      "product",
+      "projets",
+      "project",
+    ],
+  },
+  {
+    id: "skills",
+    label: "Compétences",
+    icon: "🛠️",
+    keywords: [
+      "compétences",
+      "competences",
+      "skills",
+      "outils",
+      "hard skills",
+      "soft skills",
+    ],
+  },
+  {
+    id: "resume",
+    label: "CV",
+    icon: "📄",
+    keywords: ["cv", "resume", "curriculum", "curriculum vitae"],
+  },
+  {
+    id: "contact",
+    label: "Contact",
+    icon: "📬",
+    keywords: ["contact", "email", "mail", "linkedin", "message"],
+  },
 ];
 
 const BOOKING_URL = "https://calendar.app.google/nhgLfn6C8yLL2LhL8";
@@ -30,6 +84,9 @@ export default function Desktop() {
 
   const [currentTime, setCurrentTime] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<typeof APPS_LIST>([]);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
   
   // --- ÉTATS DE CHARGEMENT & INTERACTION ---
@@ -53,7 +110,7 @@ export default function Desktop() {
   useEffect(() => {
     const audio = new Audio("/mondamusic-lofi-lofi-chill-lofi-girl-491690.mp3");
     audio.loop = true;
-    audio.volume = 0.35;
+    audio.volume = 0.30;
     audioRef.current = audio;
 
     return () => {
@@ -72,7 +129,7 @@ export default function Desktop() {
           setTimeout(() => setIsLoading(false), 500); // Petit délai pour le style
           return 100;
         }
-        return prev + 4; // Vitesse du chargement
+        return prev + 3; // Vitesse du chargement
       });
     }, 100);
 
@@ -130,16 +187,96 @@ export default function Desktop() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    const matchedApp = APPS_LIST.find(app => app.label.toLowerCase() === value.trim().toLowerCase());
-    if (matchedApp) {
-      ds.open(matchedApp.id as any);
-      setSearchQuery("");
-    }
-  };
+  const normalizeText = (text: string) =>
+  text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 
+const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+
+  setSearchQuery(value);
+  setSelectedIndex(0);
+
+  const query = normalizeText(value.trim());
+
+  if (!query) {
+    setSearchResults([]);
+    setIsSearchOpen(false);
+    return;
+  }
+
+  const results = APPS_LIST.filter((app) => {
+    const label = normalizeText(app.label);
+    const keywords = app.keywords.map(normalizeText);
+
+    return (
+      label.startsWith(query) ||
+      label.includes(query) ||
+      keywords.some(
+        (keyword) =>
+          keyword.startsWith(query) ||
+          keyword.includes(query)
+      )
+    );
+  });
+
+  setSearchResults(results);
+  setIsSearchOpen(results.length > 0);
+};
+const openSearchResult = (app: (typeof APPS_LIST)[number]) => {
+  ds.open(app.id as any);
+  setSearchQuery("");
+  setSearchResults([]);
+  setIsSearchOpen(false);
+  setSelectedIndex(0);
+};
+
+const handleSearchKeyDown = (
+  e: React.KeyboardEvent<HTMLInputElement>
+) => {
+  if (!isSearchOpen || searchResults.length === 0) {
+    if (e.key === "Enter") {
+      const exactMatch = APPS_LIST.find(
+        (app) =>
+          normalizeText(app.label) === normalizeText(searchQuery.trim())
+      );
+
+      if (exactMatch) {
+        openSearchResult(exactMatch);
+      }
+    }
+
+    return;
+  }
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+
+    setSelectedIndex((prev) =>
+      prev < searchResults.length - 1 ? prev + 1 : 0
+    );
+  }
+
+  if (e.key === "ArrowUp") {
+    e.preventDefault();
+
+    setSelectedIndex((prev) =>
+      prev > 0 ? prev - 1 : searchResults.length - 1
+    );
+  }
+
+  if (e.key === "Enter") {
+    e.preventDefault();
+
+    openSearchResult(searchResults[selectedIndex]);
+  }
+
+  if (e.key === "Escape") {
+    setIsSearchOpen(false);
+  }
+};
   
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -546,18 +683,65 @@ export default function Desktop() {
               isStartMenuOpen ? "bg-slate-800" : "bg-indigo-900 hover:bg-indigo-950"
             }`}
           >
-             Start
+             Dossiers
           </button>
 
           <div className="relative flex-1">
-            <input 
-              type="text"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="w-full rounded-xl border-2 border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-bold outline-none text-slate-900" 
-              placeholder="Écris un nom de dossier..." 
-            />
-          </div>
+  <input
+    type="text"
+    value={searchQuery}
+    onChange={handleSearchChange}
+    onKeyDown={handleSearchKeyDown}
+    onFocus={() => {
+      if (searchResults.length > 0) {
+        setIsSearchOpen(true);
+      }
+    }}
+    className="w-full rounded-xl border-2 border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-bold outline-none text-slate-900 focus:border-indigo-500"
+    placeholder="Recherche un dossier..."
+    autoComplete="off"
+  />
+
+  <AnimatePresence>
+    {isSearchOpen && searchResults.length > 0 && (
+      <motion.div
+        initial={{ opacity: 0, y: 5, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 5, scale: 0.98 }}
+        transition={{ duration: 0.12 }}
+        className="absolute bottom-full left-0 mb-2 w-full overflow-hidden rounded-xl border-2 border-slate-900 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50"
+      >
+        {searchResults.map((app, index) => (
+          <button
+            key={app.id}
+            type="button"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              openSearchResult(app);
+            }}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition ${
+              index === selectedIndex
+                ? "bg-indigo-100"
+                : "bg-white hover:bg-slate-100"
+            }`}
+          >
+            <span className="text-base">{app.icon}</span>
+
+            <div className="flex flex-col">
+              <span className="text-xs font-black text-slate-900">
+                {app.label}
+              </span>
+
+              <span className="text-[10px] font-bold text-slate-400">
+                Ouvrir le dossier
+              </span>
+            </div>
+          </button>
+        ))}
+      </motion.div>
+    )}
+  </AnimatePresence>
+</div>
 
           <button 
             onClick={() => setIsBookingOpen(true)}
