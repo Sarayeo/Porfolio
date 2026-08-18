@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type Key } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { translations, type Language } from "./translations";
 
@@ -230,10 +230,10 @@ export default function CaseStudies({ language }: CaseStudiesProps) {
             )}
 
             {"actions" in caseStudies[tab] &&
-              caseStudies[tab].actions?.map((action) => (
+              (caseStudies[tab] as typeof caseStudies.bloop | typeof caseStudies.kirbden | typeof caseStudies.leonart).actions?.map((action: { href: Key | null | undefined; variant: string; key: string; }) => (
                 <a
                   key={action.href}
-                  href={action.href}
+                  href={action.href as string}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`inline-block w-full rounded-xl px-4 py-2.5 text-center text-sm font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition ${

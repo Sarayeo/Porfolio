@@ -174,7 +174,8 @@ export const translations = {
     },
 
     resume: {
-      download: "Télécharger le CV",
+      downloadf: "Télécharger le CV",
+      downloade: "Télécharger le CV Anglais",
       profileTitle: "Profil",
       profile:
         "Cheffe de Produit Junior spécialisée en produits digitaux, avec une forte appétence pour la transformation digitale. Expérience en cadrage d'offres, analyse des besoins métiers et pilotage de projets web & mobiles en environnement agile.",
@@ -498,7 +499,8 @@ export const translations = {
     },
 
     resume: {
-      download: "Download CV",
+      downloadf: "Download CV",
+      downloade: "Download CV english",
       profileTitle: "Profile",
       profile:
         "Junior Product Manager specialized in digital products, with a strong interest in digital transformation. Experience in offer scoping, business needs analysis and leading web & mobile projects in agile environments.",

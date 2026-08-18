@@ -29,11 +29,18 @@ export default function Resume({ language }: ResumeProps) {
         </div>
 
         <a
-          href="/CV-YEO-Sara-PO-PM- 2026.pdf"
+          href="/CV-YEO-Sara-PO-PM-2026.pdf"
           download
           className="mt-4 md:mt-0 inline-block bg-indigo-900 text-white px-4 py-2 rounded-lg border-2 border-slate-900 text-xs font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-indigo-800 transition cursor-pointer"
         >
-          {t.download}
+          {t.downloadf}
+        </a>
+        <a
+          href="/CV-YEO-Sara-POPM-2026-English.pdf"
+          download
+          className="mt-4 md:mt-0 inline-block bg-indigo-900 text-white px-4 py-2 rounded-lg border-2 border-slate-900 text-xs font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-indigo-800 transition cursor-pointer"
+        >
+          {t.downloade}
         </a>
       </div>
 
