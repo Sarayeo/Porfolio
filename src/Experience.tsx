@@ -2,19 +2,21 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { translations, type Language } from "./Translations";
+import { translations, type Language } from "./translations";
+import { careerProfiles, type CareerProfile } from "./careerProfiles";
 
 type ExpId = "suitus" | "bpce" | "lmp";
 
 type ExperienceProps = {
   language: Language;
+  profile: CareerProfile;
 };
 
-export default function Experience({ language }: ExperienceProps) {
+export default function Experience({ language, profile }: ExperienceProps) {
   const [tab, setTab] = useState<ExpId>("suitus");
 
   const t = translations[language].experience;
-  const data = t.entries[tab];
+  const data = careerProfiles[language][profile].experience[tab];
 
   const expTabs = [
     { id: "suitus" as const, label: t.tabs.suitus },
@@ -23,17 +25,20 @@ export default function Experience({ language }: ExperienceProps) {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex border-b border-slate-200 gap-1">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="ui-tabs flex max-w-full gap-1 overflow-x-auto border-b border-slate-200" role="tablist">
         {expTabs.map((item) => (
           <button
+            type="button"
             key={item.id}
             onClick={() => setTab(item.id)}
-            className={`px-4 py-2 font-bold text-sm rounded-t-xl transition-all duration-150 -mb-px border-2 border-b-0 ${
+            className={`shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 font-bold text-xs sm:text-sm rounded-t-xl transition-all duration-150 -mb-px border-2 border-b-0 ${
               tab === item.id
                 ? "border-blue-900 bg-blue-900 text-white"
                 : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
+            role="tab"
+            aria-selected={tab === item.id}
           >
             {item.label}
           </button>
@@ -42,14 +47,14 @@ export default function Experience({ language }: ExperienceProps) {
 
       <AnimatePresence mode="wait">
         <motion.div
-          key={tab}
+          key={`${profile}-${tab}`}
           initial={{ y: 8, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -8, opacity: 0 }}
           transition={{ duration: 0.18 }}
           className="grid gap-4 md:grid-cols-3"
         >
-          <section className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 md:col-span-2">
+          <section className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-3 sm:p-4 md:col-span-2">
             <div className="mb-3">
               <h3 className="font-extrabold text-blue-950">{data.role}</h3>
               <p className="text-xs font-bold text-slate-500">{data.period}</p>
@@ -71,7 +76,7 @@ export default function Experience({ language }: ExperienceProps) {
           </section>
 
           <aside className="space-y-3">
-            <div className="rounded-2xl border-2 border-orange-200 bg-orange-50 p-4">
+            <div className="retro-hover rounded-2xl border-2 border-orange-200 bg-orange-50 p-4">
               <p className="font-extrabold text-orange-700 text-sm mb-2">
                 {data.highlightTitle}
               </p>
@@ -81,12 +86,12 @@ export default function Experience({ language }: ExperienceProps) {
               </p>
             </div>
 
-            <div className="rounded-2xl border-2 border-blue-200 bg-blue-50 p-4">
+            <div className="retro-hover rounded-2xl border-2 border-blue-200 bg-blue-50 p-4">
               <p className="font-extrabold text-blue-900 text-sm mb-2">
                 {t.skillsTitle}
               </p>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 select-none">
                 {data.skills.map((skill) => (
                   <span
                     key={skill}

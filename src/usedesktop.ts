@@ -1,17 +1,28 @@
 "use client";
+
 import { useState } from "react";
-export type AppId = "about" | "experience" | "cases" | "skills" | "resume" | "contact";
+
+export type AppId =
+  | "about"
+  | "experience"
+  | "cases"
+  | "skills"
+  | "resume"
+  | "contact";
+
 export function useDesktopState() {
   const [openApps, setOpenApps] = useState<AppId[]>([]);
-  const [active, setActive] = useState<AppId | null>(null);
+
   const open = (id: AppId) => {
-    setOpenApps(v => v.includes(id) ? v : [...v, id]);
-    setActive(id);
+    setOpenApps((apps) => [...apps.filter((app) => app !== id), id]);
   };
+
   const close = (id: AppId) => {
-    setOpenApps(v => v.filter(a => a !== id));
-    setActive(a => (a === id ? null : a));
+    setOpenApps((apps) => apps.filter((app) => app !== id));
   };
-  const bringToFront = (id: AppId) => setActive(id);
+
+  const bringToFront = open;
+  const active = openApps.at(-1) ?? null;
+
   return { openApps, active, open, close, bringToFront };
 }

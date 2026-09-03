@@ -7,12 +7,12 @@ import {
   type ReactNode,
 } from "react";
 
-import { translations, type Language } from "./Translations";
+import { translations, type Language } from "./translations";
 
 type LanguageContextType = {
   language: Language;
   setLanguage: (language: Language) => void;
-  t: typeof translations.fr;
+  t: (typeof translations)[Language];
 };
 
 const LanguageContext = createContext<LanguageContextType | null>(null);
@@ -39,6 +39,8 @@ export function LanguageProvider({
   );
 }
 
+// A hook intentionally shares this module with its provider.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useLanguage() {
   const context = useContext(LanguageContext);
 

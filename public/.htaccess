@@ -1,0 +1,33 @@
+Options -MultiViews
+RewriteEngine On
+
+# Aliases courts proposés initialement : redirection vers les URL explicites.
+RewriteCond %{HTTP_HOST} ^pw\.sarafolio\.com$ [NC]
+RewriteRule ^ https://po.sarafolio.com%{REQUEST_URI} [R=301,L]
+
+RewriteCond %{HTTP_HOST} ^pm\.sarafolio\.com$ [NC]
+RewriteRule ^ https://pmo.sarafolio.com%{REQUEST_URI} [R=301,L]
+
+# Secours pour l'application Vite si une route est ajoutée plus tard.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType video/mp4 "access plus 1 year"
+  ExpiresByType application/pdf "access plus 1 month"
+</IfModule>

@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { translations, type Language } from "./Translations";
+import { translations, type Language } from "./translations";
+import { careerProfiles, type CareerProfile } from "./careerProfiles";
 
 type TabId = "hard" | "product" | "soft";
 
 type SkillsProps = {
   language: Language;
+  profile: CareerProfile;
 };
 
 type Certification = {
@@ -53,7 +55,7 @@ function CertificationBadge({ cert }: { cert: Certification }) {
   const content = (
     <motion.div
       whileHover={{ scale: 1.03 }}
-      className="flex items-center gap-3 rounded-xl border-2 border-amber-300 bg-amber-50 px-3 py-2.5 shadow-sm"
+      className="retro-hover flex items-center gap-3 rounded-xl border-2 border-amber-300 bg-amber-50 px-3 py-2.5 shadow-sm"
     >
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-amber-400 bg-white text-base">
         🏅
@@ -104,17 +106,18 @@ function CertificationsBlock({
   );
 }
 
-export default function Skills({ language }: SkillsProps) {
+export default function Skills({ language, profile }: SkillsProps) {
   const [tab, setTab] = useState<TabId>("hard");
   const [activeTool, setActiveTool] = useState<
     (typeof tools)[number] | null
   >(null);
 
   const t = translations[language].skills;
+  const profileCopy = careerProfiles[language][profile].skills;
 
   const tabs = [
     { id: "hard" as const, label: t.tabs.hard },
-    { id: "product" as const, label: t.tabs.product },
+    { id: "product" as const, label: profileCopy.specialtyTab },
     { id: "soft" as const, label: t.tabs.soft },
   ];
 
@@ -133,17 +136,20 @@ export default function Skills({ language }: SkillsProps) {
   }));
 
   return (
-    <div className="space-y-6">
-      <div className="flex border-b border-slate-200 gap-1">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="ui-tabs flex max-w-full gap-1 overflow-x-auto border-b border-slate-200" role="tablist">
         {tabs.map((item) => (
           <button
+            type="button"
             key={item.id}
             onClick={() => setTab(item.id)}
-            className={`px-4 py-2 font-bold text-sm rounded-t-xl transition-all duration-200 -mb-px border-2 border-b-0 ${
+            className={`shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 font-bold text-xs sm:text-sm rounded-t-xl transition-all duration-200 -mb-px border-2 border-b-0 ${
               tab === item.id
                 ? "border-blue-900 bg-blue-900 text-white shadow-sm"
                 : "border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100"
             }`}
+            role="tab"
+            aria-selected={tab === item.id}
           >
             {item.label}
           </button>
@@ -152,22 +158,22 @@ export default function Skills({ language }: SkillsProps) {
 
       <AnimatePresence mode="wait">
         <motion.div
-          key={`${language}-${tab}`}
+          key={`${language}-${profile}-${tab}`}
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -10, opacity: 0 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="grid gap-4 md:grid-cols-3"
         >
-          <section className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-5 md:col-span-2">
+          <section className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-3 sm:p-5 md:col-span-2">
             {tab === "hard" && (
               <>
                 <h3 className="mb-3 font-extrabold text-blue-950">
-                  {t.hardTitle}
+                  {profileCopy.hardTitle}
                 </h3>
 
                 <ul className="text-sm text-slate-700 space-y-1 mb-6">
-                  {t.hardList.map((item) => (
+                  {profileCopy.hardList.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
@@ -176,12 +182,13 @@ export default function Skills({ language }: SkillsProps) {
                   {t.toolsTitle}
                 </h3>
 
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 min-[420px]:grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4">
                   {tools.map((tool) => {
                     const isActive = activeTool?.name === tool.name;
 
                     return (
                       <motion.button
+                        type="button"
                         key={tool.name}
                         onClick={() => setActiveTool(tool)}
                         whileHover={{ scale: 1.08 }}
@@ -191,11 +198,15 @@ export default function Skills({ language }: SkillsProps) {
                             ? "bg-blue-100 border-blue-400 shadow-sm"
                             : "bg-white border-slate-200 hover:border-slate-300"
                         }`}
+                        aria-pressed={isActive}
                       >
                         <img
                           src={tool.logo}
                           alt={tool.name}
                           className="h-10 w-10 object-contain mb-2"
+                          loading="lazy"
+                          decoding="async"
+                          draggable={false}
                         />
 
                         <span className="text-xs font-medium text-slate-700">
@@ -230,11 +241,11 @@ export default function Skills({ language }: SkillsProps) {
             {tab === "product" && (
               <>
                 <h3 className="mb-3 font-extrabold text-blue-950">
-                  {t.productTitle}
+                  {profileCopy.specialtyTitle}
                 </h3>
 
                 <ul className="text-sm text-slate-700 space-y-2">
-                  {t.productList.map((item) => (
+                  {profileCopy.specialtyList.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
@@ -267,20 +278,20 @@ export default function Skills({ language }: SkillsProps) {
           </section>
 
           <aside className="space-y-3">
-            <div className="rounded-2xl border-2 border-blue-200 bg-linear-to-br from-blue-50 to-white p-4">
+            <div className="retro-hover rounded-2xl border-2 border-blue-200 bg-linear-to-br from-blue-50 to-white p-4">
               <p className="font-extrabold text-blue-900 text-sm mb-2">
                 {t.profileTitle}
               </p>
 
               <ul className="text-xs font-bold space-y-1 text-slate-700">
-                {t.profileBullets.map((item) => (
+                {profileCopy.profileBullets.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
             </div>
 
             <div className="rounded-xl border p-3 text-xs text-slate-600 bg-white">
-              {t.profileDescription}
+              {profileCopy.profileDescription}
             </div>
           </aside>
         </motion.div>

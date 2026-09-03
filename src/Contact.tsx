@@ -1,27 +1,51 @@
 "use client";
 
-import { translations, type Language } from "./Translations";
+import { translations, type Language } from "./translations";
+import { careerProfiles, type CareerProfile } from "./careerProfiles";
 
 type ContactProps = {
   language: Language;
+  profile: CareerProfile;
 };
 
-export default function Contact({ language }: ContactProps) {
+export default function Contact({ language, profile }: ContactProps) {
   const t = translations[language].contact;
+  const profileCopy = careerProfiles[language][profile];
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <section className="retro-hover rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
         <h3 className="text-lg font-bold text-slate-900">{t.title}</h3>
 
-        <p className="mt-2 text-slate-700">{t.description}</p>
+        <div
+          className={`mt-3 inline-flex rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-wide select-none ${
+            profile === "product"
+              ? "border-indigo-200 bg-indigo-50 text-indigo-800"
+              : "border-teal-200 bg-teal-50 text-teal-800"
+          }`}
+        >
+          {language === "fr" ? "Recherche active" : "Actively looking"}
+        </div>
+
+        <p className="mt-3 text-slate-700">{profileCopy.contactDescription}</p>
 
         <div className="mt-4 space-y-3 text-sm text-slate-700">
           <p>
-            {t.emailLabel}: yeokpeusseusarafiela@gmail.com
+            {t.emailLabel}:{" "}
+            <a className="break-all font-semibold text-indigo-800 hover:underline" href="mailto:yeokpeusseusarafiela@gmail.com">
+              yeokpeusseusarafiela@gmail.com
+            </a>
           </p>
           <p>
-            {t.linkedinLabel}: linkedin.com/in/sara-kp-yeo
+            {t.linkedinLabel}:{" "}
+            <a
+              className="break-all font-semibold text-indigo-800 hover:underline"
+              href="https://www.linkedin.com/in/sara-kp-yeo/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              linkedin.com/in/sara-kp-yeo
+            </a>
           </p>
           <p>
             {t.locationLabel}: {t.location}
@@ -29,7 +53,7 @@ export default function Contact({ language }: ContactProps) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <section className="retro-hover rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
         <h3 className="text-lg font-bold text-slate-900">
           {t.quickActions}
         </h3>
@@ -37,7 +61,7 @@ export default function Contact({ language }: ContactProps) {
         <div className="mt-4 flex flex-col gap-3">
           <a
             href="mailto:yeokpeusseusarafiela@gmail.com"
-            className="rounded-2xl bg-blue-500 px-4 py-3 text-center font-semibold text-white transition hover:bg-blue-600"
+            className="retro-link rounded-2xl bg-blue-500 px-4 py-3 text-center font-semibold text-white transition hover:bg-blue-600"
           >
             {t.sendEmail}
           </a>
@@ -46,7 +70,7 @@ export default function Contact({ language }: ContactProps) {
             href="https://www.linkedin.com/in/sara-kp-yeo/"
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center font-semibold text-slate-700 transition hover:bg-slate-100"
+            className="retro-link rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center font-semibold text-slate-700 transition hover:bg-slate-100"
           >
             {t.viewLinkedin}
           </a>

@@ -1,13 +1,18 @@
 "use client";
 
-import { useState, type Key } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { translations, type Language } from "./Translations";
+import { translations, type Language } from "./translations";
+import {
+  careerProfiles,
+  type CareerProfile,
+} from "./careerProfiles";
 
 type TabId = "bloop" | "kirbden" | "pokedex" | "leonart";
 
 type CaseStudiesProps = {
   language: Language;
+  profile: CareerProfile;
 };
 
 const tabs: { id: TabId; label: string }[] = [
@@ -50,7 +55,7 @@ const caseStudies = {
     media: {
       type: "video" as const,
       src: "/images/pokedex.mp4",
-      poster: "/images/pokedex-poster.png",
+      poster: "/images/pokedex-poster.jpg",
       href: "https://js-a2-lynda-co.vercel.app/",
     },
   },
@@ -70,25 +75,31 @@ const caseStudies = {
   },
 } as const;
 
-export default function CaseStudies({ language }: CaseStudiesProps) {
+export default function CaseStudies({ language, profile }: CaseStudiesProps) {
   const [tab, setTab] = useState<TabId>("bloop");
 
   const t = translations[language].cases;
+  const profileCopy = careerProfiles[language][profile];
   const data = t.entries[tab];
-  const media = caseStudies[tab].media;
+  const currentCase = caseStudies[tab];
+  const media = currentCase.media;
+  const actions = "actions" in currentCase ? currentCase.actions : [];
 
   return (
-    <div className="space-y-6">
-      <div className="flex border-b border-slate-200 gap-1">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="ui-tabs flex max-w-full gap-1 overflow-x-auto border-b border-slate-200" role="tablist">
         {tabs.map((item) => (
           <button
+            type="button"
             key={item.id}
             onClick={() => setTab(item.id)}
-            className={`px-4 py-2 font-bold text-sm rounded-t-xl transition-all duration-150 -mb-px border-2 border-b-0 ${
+            className={`shrink-0 whitespace-nowrap px-3 sm:px-4 py-2 font-bold text-xs sm:text-sm rounded-t-xl transition-all duration-150 -mb-px border-2 border-b-0 ${
               tab === item.id
                 ? "border-blue-900 bg-blue-900 text-white"
                 : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
+            role="tab"
+            aria-selected={tab === item.id}
           >
             {item.label}
           </button>
@@ -97,14 +108,14 @@ export default function CaseStudies({ language }: CaseStudiesProps) {
 
       <AnimatePresence mode="wait">
         <motion.div
-          key={`${language}-${tab}`}
+          key={`${language}-${profile}-${tab}`}
           initial={{ y: 8, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -8, opacity: 0 }}
           transition={{ duration: 0.18 }}
           className="grid gap-4 md:grid-cols-3"
         >
-          <section className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 md:col-span-2">
+          <section className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-3 sm:p-4 md:col-span-2">
             <h3 className="mb-1 font-extrabold text-blue-950">
               {t.contextTitle}
             </h3>
@@ -146,7 +157,7 @@ export default function CaseStudies({ language }: CaseStudiesProps) {
             )}
 
             {tab === "pokedex" && (
-              <div className="mt-2 flex flex-wrap gap-2">
+              <div className="mt-2 flex flex-wrap gap-2 select-none">
                 {["Javascript", "API REST", "SCSS", "Vercel"].map((tech) => (
                   <span
                     key={tech}
@@ -192,12 +203,40 @@ export default function CaseStudies({ language }: CaseStudiesProps) {
           </section>
 
           <aside className="space-y-3">
+            <div
+              className={`retro-hover rounded-2xl border-2 p-3 ${
+                profile === "product"
+                  ? "border-indigo-200 bg-indigo-50"
+                  : "border-teal-200 bg-teal-50"
+              }`}
+            >
+              <p
+                className={`mb-2 text-xs font-black uppercase tracking-wide ${
+                  profile === "product" ? "text-indigo-900" : "text-teal-900"
+                }`}
+              >
+                {profileCopy.caseAngleTitle}
+              </p>
+
+              <ul className="space-y-1 text-xs font-bold text-slate-700">
+                {profileCopy.caseAngles[tab].map((angle) => (
+                  <li key={angle} className="flex gap-2">
+                    <span aria-hidden="true">✓</span>
+                    <span>{angle}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
             {media.type === "image" && (
-              <div className="overflow-hidden rounded-2xl border-2 border-blue-200 bg-blue-50">
+              <div className="retro-hover overflow-hidden rounded-2xl border-2 border-blue-200 bg-blue-50">
                 <img
                   src={media.src}
                   alt={media.alt}
-                  className="h-40 w-full object-cover"
+                  className="aspect-video w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
                 />
               </div>
             )}
@@ -207,9 +246,9 @@ export default function CaseStudies({ language }: CaseStudiesProps) {
                 href={media.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group block overflow-hidden rounded-2xl border-2 border-blue-200 bg-blue-50"
+                className="group retro-link block overflow-hidden rounded-2xl border-2 border-blue-200 bg-blue-50"
               >
-                <div className="relative h-40 w-full">
+                <div className="relative aspect-video w-full">
                   <video
                     src={media.src}
                     poster={media.poster}
@@ -218,6 +257,7 @@ export default function CaseStudies({ language }: CaseStudiesProps) {
                     loop
                     muted
                     playsInline
+                    preload="metadata"
                   />
 
                   <div className="absolute inset-0 flex items-center justify-center bg-black/10 transition group-hover:bg-black/30" />
@@ -229,14 +269,13 @@ export default function CaseStudies({ language }: CaseStudiesProps) {
               </a>
             )}
 
-            {"actions" in caseStudies[tab] &&
-              (caseStudies[tab] as typeof caseStudies.bloop | typeof caseStudies.kirbden | typeof caseStudies.leonart).actions?.map((action: { href: Key | null | undefined; variant: string; key: string; }) => (
+            {actions.map((action) => (
                 <a
                   key={action.href}
-                  href={action.href as string}
+                  href={action.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`inline-block w-full rounded-xl px-4 py-2.5 text-center text-sm font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition ${
+                  className={`retro-link inline-block w-full rounded-xl px-4 py-2.5 text-center text-sm font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition ${
                     action.variant === "primary"
                       ? "bg-orange-500 text-white hover:bg-orange-600"
                       : "bg-blue-900 text-white hover:bg-blue-800"

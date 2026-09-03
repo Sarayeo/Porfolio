@@ -1,18 +1,35 @@
 "use client";
 
+import { useId } from "react";
+
 interface FolderIconProps {
   label: string;
   onOpen: () => void;
+  active?: boolean;
 }
 
-export default function FolderIcon({ label, onOpen }: FolderIconProps) {
+export default function FolderIcon({
+  label,
+  onOpen,
+  active = false,
+}: FolderIconProps) {
+  const id = useId().replace(/:/g, "");
+  const backGradientId = `${id}-folder-back`;
+  const frontGradientId = `${id}-folder-front`;
+  const shadowGradientId = `${id}-folder-shadow`;
+
   return (
     <button
+      type="button"
       onClick={onOpen}
-      className="group flex flex-col items-center focus:outline-none select-none cursor-pointer"
+      className={`folder-button group relative z-20 flex min-h-23 w-full min-w-0 cursor-pointer touch-manipulation flex-col items-center justify-center rounded-xl border-0 bg-transparent p-1 select-none focus:outline-none sm:min-h-28 sm:w-auto sm:min-w-24 ${
+        active ? "folder-button-active" : ""
+      }`}
+      aria-label={label}
+      aria-pressed={active}
     >
       {/* ================= CONTENEUR DU DOSSIER ET DE SON OMBRE RÉTRO ================= */}
-      <div className="relative w-24 h-20 flex items-center justify-center transition-transform duration-200 ease-out group-hover:scale-105 group-active:scale-95">
+      <div className="folder-visual pointer-events-none relative flex h-15 w-18 items-center justify-center transition-transform duration-200 ease-out group-hover:-translate-y-1 group-hover:scale-105 group-focus-visible:-translate-y-1 group-focus-visible:scale-105 group-active:translate-y-0 group-active:scale-95 sm:h-20 sm:w-24">
         
         
         <div className="absolute bottom-1 right-[-8px] w-[85%] h-[40%] bg-slate-900/15 rounded-[100%] blur-[6px] transform rotate-3 pointer-events-none transition-opacity group-hover:opacity-80" />
@@ -20,26 +37,27 @@ export default function FolderIcon({ label, onOpen }: FolderIconProps) {
         {/* ================= REPRODUCTION VECTORIELLE DU DOSSIER ================= */}
         <svg 
           viewBox="0 0 120 80" 
-          className="w-full h-full drop-shadow-[0_2px_3px_rgba(0,0,0,0.05)]"
+          className="h-full w-full drop-shadow-[0_2px_3px_rgba(0,0,0,0.05)] transition-[filter] duration-200 group-hover:drop-shadow-[0_7px_5px_rgba(30,27,75,0.22)]"
           fill="none" 
           xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
         >
           <defs>
             {/* Rabat arrière (Couleur Saumon / Terracotta claire) */}
-            <linearGradient id="backTabGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <linearGradient id={backGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stopColor="#f4a290" />
               <stop offset="100%" stopColor="#e28875" />
             </linearGradient>
             
             {/* Corps principal avant (Dégradé Jaune Sable / Crème chaud) */}
-            <linearGradient id="frontBodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <linearGradient id={frontGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stopColor="#fbe6be" />
               <stop offset="60%" stopColor="#f5ce95" />
               <stop offset="100%" stopColor="#eeb26b" />
             </linearGradient>
 
             {/* Ombre interne entre le contenu et la pochette avant */}
-            <linearGradient id="innerShadowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id={shadowGradientId} x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#3d2a1c" stopOpacity="0.25" />
               <stop offset="40%" stopColor="#3d2a1c" stopOpacity="0.05" />
               <stop offset="100%" stopColor="#3d2a1c" stopOpacity="0" />
@@ -49,7 +67,7 @@ export default function FolderIcon({ label, onOpen }: FolderIconProps) {
           {/* 1. RABAT ARRIÈRE (Saumon avec sa forme arrondie) */}
           <path 
             d="M12 14 C12 10, 16 8, 22 8 L44 8 C48 8, 52 10, 56 13 L64 19 C66 20, 68 21, 71 21 L102 21 C107 21, 110 24, 110 29 L110 38 L12 38 Z" 
-            fill="url(#backTabGrad)" 
+            fill={`url(#${backGradientId})`}
             stroke="#322214" 
             strokeWidth="3" 
             strokeLinejoin="round"
@@ -66,7 +84,7 @@ export default function FolderIcon({ label, onOpen }: FolderIconProps) {
           {/* 3. CORPS PRINCIPAL AVANT (Forme trapèze adoucie et inclinée) */}
           <path 
             d="M17 31 C17 26.5, 21 23, 26.5 23 L102 23 C106.5 23, 110 27, 109 32.5 L102 74 C101 79.5, 96 83, 90.5 83 L21 83 C15.5 83, 12 79, 12.5 73.5 L17 31 Z" 
-            fill="url(#frontBodyGrad)" 
+            fill={`url(#${frontGradientId})`}
             stroke="#322214" 
             strokeWidth="3.2" 
             strokeLinejoin="round"
@@ -75,14 +93,14 @@ export default function FolderIcon({ label, onOpen }: FolderIconProps) {
           {/* 4. OMBRE PROPRE SUR LE DEVANT (Effet d'arrondi sur la droite de ton modèle) */}
           <path 
             d="M75 23 L102 23 C106.5 23, 110 27, 109 32.5 L102 74 C101 79.5, 96 83, 90.5 83 L70 83 C85 70, 88 40, 75 23 Z" 
-            fill="url(#innerShadowGrad)" 
+            fill={`url(#${shadowGradientId})`}
             className="opacity-60"
           />
         </svg>
       </div>
 
       {/* ================= LABEL TEXTE DU DOSSIER ================= */}
-      <span className="mt-1 px-2 py-0.5 text-xs font-bold text-[#000000] tracking-wide text-center font-sans select-none max-w-[130px] transition-colors group-hover:text-black">
+      <span className="desktop-label pointer-events-none mt-1 min-h-7 max-w-full rounded px-1 py-0.5 text-center font-sans text-[10px] font-bold leading-tight tracking-wide text-black select-none transition-colors group-hover:bg-indigo-950 group-hover:text-white group-focus-visible:bg-indigo-950 group-focus-visible:text-white group-active:bg-indigo-950 group-active:text-white sm:max-w-[130px] sm:px-2 sm:text-xs">
         {label}
       </span>
     </button>

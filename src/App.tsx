@@ -1,19 +1,37 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useDesktopState } from "./usedesktop";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
+import { useDesktopState, type AppId } from "./usedesktop";
 import { AnimatePresence, motion } from "framer-motion";
 import FolderIcon from "./FolderIcon";
 import Window from "./window";
-import About from "./About";
-import Experience from "./Experience";
-import CaseStudies from "./CaseStudies";
-import Skills from "./skills";
-import Resume from "./Resume";
-import Contact from "./Contact";
-import { translations, type Language } from "./Translations";
+import { translations, type Language } from "./translations";
+import ProfileSwitcher from "./ProfileSwitcher";
+import {
+  CAREER_PROFILE_STORAGE_KEY,
+  careerProfiles,
+  hasProfileSubdomain,
+  resolveCareerProfile,
+  type CareerProfile,
+} from "./careerProfiles";
 
 const BOOKING_URL = "https://calendar.app.google/nhgLfn6C8yLL2LhL8";
+const LOADING_STEP_MS = 50;
+const LOADING_EXIT_DELAY_MS = 250;
+
+const About = lazy(() => import("./About"));
+const Experience = lazy(() => import("./Experience"));
+const CaseStudies = lazy(() => import("./CaseStudies"));
+const Skills = lazy(() => import("./skills"));
+const Resume = lazy(() => import("./Resume"));
+const Contact = lazy(() => import("./Contact"));
 
 const APPS_LIST = [
   {
@@ -95,16 +113,29 @@ const APPS_LIST = [
       en: ["contact", "email", "mail", "linkedin", "message", "call"],
     },
   },
-] as const;
+] as const satisfies readonly {
+  id: AppId;
+  icon: string;
+  label: Record<Language, string>;
+  keywords: Record<Language, readonly string[]>;
+}[];
 
 export default function Desktop() {
   const ds = useDesktopState();
   const hasOpenWindow = ds.openApps.length > 0;
-  const currentActiveApp = ds.openApps[ds.openApps.length - 1];
+  const currentActiveApp = ds.active;
 
   const [currentTime, setCurrentTime] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [language, setLanguage] = useState<Language>("fr");
+  const [language, setLanguage] = useState<Language>(() => {
+    const savedLanguage = window.localStorage.getItem("portfolio-language");
+    return savedLanguage === "fr" || savedLanguage === "en"
+      ? savedLanguage
+      : "fr";
+  });
+  const [careerProfile, setCareerProfile] = useState<CareerProfile>(
+    resolveCareerProfile
+  );
   const [searchResults, setSearchResults] = useState<typeof APPS_LIST[number][]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -117,72 +148,167 @@ export default function Desktop() {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const desktopRef = useRef<HTMLElement>(null);
   const startMenuRef = useRef<HTMLDivElement>(null);
   const startButtonRef = useRef<HTMLButtonElement>(null);
 
   const t = translations[language];
-
-  useEffect(() => {
-    const savedLanguage = window.localStorage.getItem("portfolio-language");
-    if (savedLanguage === "fr" || savedLanguage === "en") {
-      setLanguage(savedLanguage);
-    }
-  }, []);
+  const profileCopy = careerProfiles[language][careerProfile];
 
   useEffect(() => {
     window.localStorage.setItem("portfolio-language", language);
   }, [language]);
 
   useEffect(() => {
-    const audio = new Audio("/mondamusic-lofi-lofi-chill-lofi-girl-491690.mp3");
-    audio.loop = true;
-    audio.volume = 0.3;
-    audioRef.current = audio;
+    window.localStorage.setItem(
+      CAREER_PROFILE_STORAGE_KEY,
+      careerProfile
+    );
 
-    return () => {
-      audio.pause();
+    document.documentElement.lang = language;
+    document.title = profileCopy.metaTitle;
+
+    const description = document.querySelector<HTMLMetaElement>(
+      'meta[name="description"]'
+    );
+    const ogTitle = document.querySelector<HTMLMetaElement>(
+      'meta[property="og:title"]'
+    );
+    const ogDescription = document.querySelector<HTMLMetaElement>(
+      'meta[property="og:description"]'
+    );
+    const ogLocale = document.querySelector<HTMLMetaElement>(
+      'meta[property="og:locale"]'
+    );
+
+    description?.setAttribute("content", profileCopy.metaDescription);
+    ogTitle?.setAttribute("content", profileCopy.metaTitle);
+    ogDescription?.setAttribute("content", profileCopy.metaDescription);
+    ogLocale?.setAttribute("content", language === "fr" ? "fr_FR" : "en_GB");
+
+    let canonical = document.querySelector<HTMLLinkElement>(
+      'link[rel="canonical"]'
+    );
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
+    }
+    canonical.href = `https://${
+      careerProfile === "product" ? "po" : "pmo"
+    }.sarafolio.com/`;
+  }, [careerProfile, language, profileCopy]);
+
+  const handleProfileChange = (nextProfile: CareerProfile) => {
+    if (nextProfile === careerProfile) return;
+
+    window.localStorage.setItem(CAREER_PROFILE_STORAGE_KEY, nextProfile);
+
+    const hostname = window.location.hostname.toLowerCase();
+    if (
+      hasProfileSubdomain(hostname) &&
+      (hostname === "sarafolio.com" || hostname.endsWith(".sarafolio.com"))
+    ) {
+      const targetUrl = new URL(window.location.href);
+      targetUrl.hostname = `${
+        nextProfile === "product" ? "po" : "pmo"
+      }.sarafolio.com`;
+      targetUrl.searchParams.delete("profile");
+      window.location.assign(targetUrl);
+      return;
+    }
+
+    setCareerProfile(nextProfile);
+
+    if (!hasProfileSubdomain(hostname)) {
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set("profile", nextProfile);
+      window.history.replaceState({}, "", currentUrl);
+    }
+  };
+
+  useEffect(
+    () => () => {
+      audioRef.current?.pause();
       audioRef.current = null;
-    };
-  }, []);
+    },
+    []
+  );
 
   useEffect(() => {
     if (!hasInteracted) return;
 
+    let exitTimer: ReturnType<typeof setTimeout> | undefined;
+
     const interval = setInterval(() => {
       setLoadingProgress((prev) => {
-        if (prev >= 100) {
+        if (prev >= 97) {
           clearInterval(interval);
-          setTimeout(() => setIsLoading(false), 500);
+          exitTimer = setTimeout(
+            () => setIsLoading(false),
+            LOADING_EXIT_DELAY_MS
+          );
           return 100;
         }
         return prev + 3;
       });
-    }, 100);
+    }, LOADING_STEP_MS);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (exitTimer) clearTimeout(exitTimer);
+    };
   }, [hasInteracted]);
+
+  const getAudio = () => {
+    if (!audioRef.current) {
+      const audio = new Audio(
+        "/mondamusic-lofi-lofi-chill-lofi-girl-491690.mp3"
+      );
+      audio.loop = true;
+      audio.volume = 0.3;
+      audio.preload = "none";
+      audioRef.current = audio;
+    }
+
+    return audioRef.current;
+  };
 
   const handleStartExperience = () => {
     setHasInteracted(true);
 
-    if (audioRef.current) {
-      audioRef.current
-        .play()
-        .then(() => setIsMuted(false))
-        .catch((err) => console.log("Audio blocked:", err));
-    }
+    getAudio()
+      .play()
+      .then(() => setIsMuted(false))
+      .catch(() => setIsMuted(true));
   };
 
   const toggleMute = () => {
-    if (!audioRef.current) return;
+    const audio = getAudio();
 
     if (isMuted) {
-      audioRef.current.play();
-      setIsMuted(false);
+      audio
+        .play()
+        .then(() => setIsMuted(false))
+        .catch(() => setIsMuted(true));
     } else {
-      audioRef.current.pause();
+      audio.pause();
       setIsMuted(true);
     }
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLElement>) => {
+    if (event.pointerType !== "mouse") return;
+
+    const bounds = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty(
+      "--cursor-x",
+      `${event.clientX - bounds.left}px`
+    );
+    event.currentTarget.style.setProperty(
+      "--cursor-y",
+      `${event.clientY - bounds.top}px`
+    );
   };
 
   useEffect(() => {
@@ -225,6 +351,20 @@ export default function Desktop() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+
+      setIsBookingOpen(false);
+      setIsMusicOpen(false);
+      setIsStartMenuOpen(false);
+      setIsSearchOpen(false);
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, []);
+
   const normalizeText = (text: string) =>
     text
       .toLowerCase()
@@ -264,11 +404,17 @@ export default function Desktop() {
   };
 
   const openSearchResult = (app: (typeof APPS_LIST)[number]) => {
-    ds.open(app.id as any);
+    ds.open(app.id);
     setSearchQuery("");
     setSearchResults([]);
     setIsSearchOpen(false);
     setSelectedIndex(0);
+  };
+
+  const openDesktopApp = (id: AppId) => {
+    setIsStartMenuOpen(false);
+    setIsSearchOpen(false);
+    ds.open(id);
   };
 
   const handleSearchKeyDown = (
@@ -341,39 +487,46 @@ export default function Desktop() {
 
   return (
     <main
-      className="relative min-h-dvh w-full overflow-hidden p-4 md:p-8 flex items-center justify-center bg-linear-to-br from-[#2e1065] via-[#6366f1] to-[#f472b6] bg-size-[400%_400%] animate-[gradientBG_15s_ease_infinite]"
+      ref={desktopRef}
+      onPointerMove={handlePointerMove}
+      data-profile={careerProfile}
+      className={`desktop-surface relative min-h-dvh w-full overflow-hidden p-2 sm:p-4 md:p-8 flex items-center justify-center bg-linear-to-br bg-size-[400%_400%] animate-[gradientBG_15s_ease_infinite] ${
+        careerProfile === "product"
+          ? "from-[#2e1065] via-[#6366f1] to-[#f472b6]"
+          : "from-[#082f49] via-[#0f766e] to-[#f59e0b]"
+      }`}
     >
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-            @keyframes gradientBG {
-              0% { background-position: 0% 50%; }
-              50% { background-position: 100% 50%; }
-              100% { background-position: 0% 50%; }
-            }
-          `,
-        }}
-      />
-
       <AnimatePresence>
         {isLoading && (
           <motion.div
             exit={{ opacity: 0, scale: 1.05 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="fixed inset-0 bg-[#1e1b4b] z-100 flex flex-col items-center justify-center p-6 font-mono select-none"
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="fixed inset-0 bg-[#1e1b4b] z-100 flex flex-col items-center justify-center p-4 sm:p-6 font-mono select-none"
           >
             <motion.div
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="w-full max-w-md bg-white border-4 border-slate-900 rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-center"
+              className="w-full max-w-md bg-white border-4 border-slate-900 rounded-2xl p-5 sm:p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-center"
             >
               <h2 className="text-xl font-black text-slate-900 uppercase tracking-wider mb-2">
                 Sara-Folio
               </h2>
 
-              <p className="text-xs font-bold text-slate-500 mb-6">
-                {t.desktop.loadingText}
+              <p className="mb-6 text-balance text-xs font-black leading-relaxed text-slate-600 sm:text-sm">
+                {language === "fr"
+                  ? "Vision produit, rigueur projet : la double compétence au service de la valeur."
+                  : "Product vision, project discipline: dual expertise serving value."}
               </p>
+
+              {!hasInteracted && (
+                <div className="mb-5 text-left">
+                  <ProfileSwitcher
+                    language={language}
+                    profile={careerProfile}
+                    onChange={handleProfileChange}
+                  />
+                </div>
+              )}
 
               {!hasInteracted ? (
                 <motion.button
@@ -382,11 +535,19 @@ export default function Desktop() {
                   onClick={handleStartExperience}
                   className="w-full py-4 bg-pink-500 hover:bg-pink-600 text-white font-black uppercase text-sm rounded-xl border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all cursor-pointer"
                 >
-                  {t.desktop.enter}
+                  {language === "fr"
+                    ? `Entrer côté ${profileCopy.shortLabel}`
+                    : `Enter ${profileCopy.shortLabel} view`}
                 </motion.button>
               ) : (
-                <div className="w-full">
-                  <div className="w-full h-8 bg-slate-100 border-4 border-slate-900 rounded-xl p-1 overflow-hidden relative">
+                <div className="w-full" aria-live="polite">
+                  <div
+                    className="w-full h-8 bg-slate-100 border-4 border-slate-900 rounded-xl p-1 overflow-hidden relative"
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={loadingProgress}
+                  >
                     <motion.div
                       className="h-full bg-linear-to-r from-indigo-500 to-purple-600 rounded-sm"
                       style={{ width: `${loadingProgress}%` }}
@@ -503,92 +664,106 @@ export default function Desktop() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="relative z-10 w-full h-[82vh] flex items-center justify-center"
+          className={`desktop-stage relative z-10 flex w-full items-center justify-center h-[calc(100dvh-5.75rem)] sm:h-[82vh] ${
+            hasOpenWindow ? "has-window" : "desktop-home"
+          }`}
         >
-          <AnimatePresence>
-            {!hasOpenWindow && (
-              <div className="absolute inset-0 pointer-events-none">
+          <motion.div
+            className={`desktop-icons relative order-2 grid w-full grid-cols-3 gap-x-1 gap-y-2 px-0.5 pointer-events-auto ${
+              hasOpenWindow ? "desktop-icons-open" : ""
+            }`}
+          >
                 <motion.div
                   variants={itemVariants}
-                  className="absolute top-6 left-[10%] md:left-[18%] pointer-events-auto transform scale-110 md:scale-125 transition-all duration-300 hover:-translate-y-1"
+                  className="desktop-shortcut order-1 relative flex min-w-0 justify-center pointer-events-auto"
                 >
                   <FolderIcon
                     label={t.folders.about}
-                    onOpen={() => ds.open("about")}
+                    onOpen={() => openDesktopApp("about")}
+                    active={currentActiveApp === "about"}
                   />
                 </motion.div>
 
                 <motion.div
                   variants={itemVariants}
-                  className="absolute top-[38%] left-[5%] md:left-[10%] pointer-events-auto transform scale-110 md:scale-125 transition-all duration-300 hover:-translate-y-1"
+                  className="desktop-shortcut order-4 relative flex min-w-0 justify-center pointer-events-auto"
                 >
                   <FolderIcon
                     label={t.folders.cases}
-                    onOpen={() => ds.open("cases")}
+                    onOpen={() => openDesktopApp("cases")}
+                    active={currentActiveApp === "cases"}
                   />
                 </motion.div>
 
                 <motion.div
                   variants={itemVariants}
-                  className="absolute top-[65%] left-[8%] md:left-[12%] pointer-events-auto transform scale-110 md:scale-125 transition-all duration-300 hover:-translate-y-1"
+                  className="desktop-shortcut order-5 relative flex min-w-0 justify-center pointer-events-auto"
                 >
                   <FolderIcon
                     label={t.folders.skills}
-                    onOpen={() => ds.open("skills")}
+                    onOpen={() => openDesktopApp("skills")}
+                    active={currentActiveApp === "skills"}
                   />
                 </motion.div>
 
                 <motion.div
                   variants={itemVariants}
-                  className="absolute top-2 left-1/2 -translate-x-1/2 pointer-events-auto transform scale-110 md:scale-125 transition-all duration-300 hover:-translate-y-1"
+                  className="desktop-shortcut order-2 relative flex min-w-0 justify-center pointer-events-auto"
                 >
                   <FolderIcon
                     label={t.folders.experience}
-                    onOpen={() => ds.open("experience")}
+                    onOpen={() => openDesktopApp("experience")}
+                    active={currentActiveApp === "experience"}
                   />
                 </motion.div>
 
                 <motion.div
                   variants={itemVariants}
-                  className="absolute top-24 right-[10%] md:right-[18%] pointer-events-auto transform scale-110 md:scale-125 transition-all duration-300 hover:-translate-y-1"
+                  className="desktop-shortcut order-3 relative flex min-w-0 justify-center pointer-events-auto"
                 >
-                  <div
-                    onClick={() => ds.open("resume")}
-                    className="cursor-pointer flex flex-col items-center"
+                  <button
+                    type="button"
+                    onClick={() => openDesktopApp("resume")}
+                    className={`folder-button group relative z-20 flex min-h-23 w-full min-w-0 cursor-pointer touch-manipulation flex-col items-center justify-center rounded-xl border-0 bg-transparent p-1 select-none sm:min-h-28 sm:w-auto sm:min-w-24 ${
+                      currentActiveApp === "resume"
+                        ? "folder-button-active"
+                        : ""
+                    }`}
+                    aria-label={`${t.desktop.openFolder}: ${t.folders.resume}`}
+                    aria-pressed={currentActiveApp === "resume"}
                   >
-                    <div className="text-4xl">📄</div>
-                    <span className="text-xs font-bold mt-1">
-                      {t.desktop.cvDesktop}
+                    <div className="folder-visual document-visual pointer-events-none text-4xl transition-transform duration-200 group-hover:-translate-y-1 group-hover:scale-105" aria-hidden="true">📄</div>
+                    <span className="desktop-label pointer-events-none mt-1 min-h-7 max-w-full rounded px-1 py-0.5 text-center text-[10px] font-bold leading-tight transition-colors group-hover:bg-indigo-950 group-hover:text-white group-focus-visible:bg-indigo-950 group-focus-visible:text-white group-active:bg-indigo-950 group-active:text-white sm:max-w-32 sm:px-2 sm:text-xs">
+                      {profileCopy.cvDesktop}
                     </span>
-                  </div>
+                  </button>
                 </motion.div>
 
                 <motion.div
                   variants={itemVariants}
-                  className="absolute top-[48%] right-[5%] md:right-[12%] pointer-events-auto transform scale-110 md:scale-125 transition-all duration-300 hover:-translate-y-1"
+                  className="desktop-shortcut order-6 relative flex min-w-0 justify-center pointer-events-auto"
                 >
                   <FolderIcon
                     label={t.folders.contact}
-                    onOpen={() => ds.open("contact")}
+                    onOpen={() => openDesktopApp("contact")}
+                    active={currentActiveApp === "contact"}
                   />
                 </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
+          </motion.div>
 
           <motion.div
             variants={itemVariants}
             layout
             transition={{ type: "spring", stiffness: 150, damping: 22 }}
-            className={`absolute z-10 w-full bg-white/95 backdrop-blur-md border-4 border-indigo-950 rounded-3xl shadow-[6px_6px_0px_0px_rgba(30,27,75,1)] flex flex-col overflow-hidden transition-all duration-500 ${
+            className={`home-card z-10 w-full bg-white/95 backdrop-blur-md border-4 border-indigo-950 rounded-2xl sm:rounded-3xl shadow-[6px_6px_0px_0px_rgba(30,27,75,1)] flex flex-col overflow-hidden transition-all duration-500 ${
               hasOpenWindow
-                ? "max-w-xs md:max-w-sm xl:max-w-md left-4 md:left-8 lg:left-16 xl:left-24 translate-x-0 hidden lg:flex"
-                : "max-w-2xl left-1/2 -translate-x-1/2"
+                ? "absolute max-w-xs md:max-w-sm xl:max-w-md left-4 md:left-8 lg:left-16 xl:left-24 translate-x-0 hidden lg:flex"
+                : "relative order-1 max-w-2xl"
             }`}
           >
-            <div className="bg-indigo-950 px-5 py-3.5 flex items-center justify-between text-indigo-100 border-b-2 border-indigo-950">
+            <div className="flex items-center justify-between border-b-2 border-indigo-950 bg-indigo-950 px-3 py-2.5 text-indigo-100 sm:px-5 sm:py-3.5">
               <span className="text-xs font-mono tracking-wider font-bold opacity-90">
-                {t.desktop.homePath}
+                {profileCopy.homePath}
               </span>
 
               <div className="flex gap-1.5 opacity-80">
@@ -600,10 +775,19 @@ export default function Desktop() {
 
             <div
               className={`flex flex-col items-center transition-all duration-500 ${
-                hasOpenWindow ? "p-6" : "p-8 md:p-10"
+                hasOpenWindow ? "p-6" : "p-3 min-[360px]:p-4 sm:p-8 md:p-10"
               }`}
             >
-              <div className="flex items-center justify-between w-full gap-5 mb-6">
+              <div className="mb-3 w-full sm:mb-5">
+                <ProfileSwitcher
+                  language={language}
+                  profile={careerProfile}
+                  onChange={handleProfileChange}
+                  compact={hasOpenWindow}
+                />
+              </div>
+
+              <div className="mb-3 flex w-full items-center justify-between gap-5 sm:mb-6">
                 <div className="text-left">
                   <h1
                     className={`font-black tracking-tight text-slate-900 transition-all ${
@@ -620,77 +804,90 @@ export default function Desktop() {
                       hasOpenWindow ? "text-xs" : "text-sm md:text-base"
                     }`}
                   >
-                    {t.home.role}
+                    {profileCopy.role}
                   </h2>
                 </div>
               </div>
 
-              <div className="relative mb-8 w-full">
+              <div className="relative mb-3 w-full sm:mb-8">
                 <p
-                  className={`w-full rounded-2xl border-2 border-slate-900 bg-white px-5 py-3 font-bold text-slate-800 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] text-center transition-all ${
+                  className={`w-full rounded-2xl border-2 border-slate-900 bg-white px-3 py-2 font-bold text-slate-800 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] text-center transition-all sm:px-5 sm:py-3 ${
                     hasOpenWindow ? "text-xs" : "text-sm md:text-base"
                   }`}
                 >
-                  {t.home.tagline}
+                  {profileCopy.tagline}
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-3 w-full mt-2">
-                <div className="relative bg-violet-100 border-2 border-slate-900 p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-2">
-                  <p className="text-base md:text-xl font-black text-slate-900 mt-2">
-                    {t.home.creativity}
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 w-full mt-1 sm:mt-2 select-none">
+                <div className="retro-hover relative flex min-h-12 items-center justify-center bg-violet-100 border-2 border-slate-900 p-2 sm:min-h-16 sm:p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-2">
+                  <p className="text-[10px] sm:text-base md:text-xl font-black leading-tight text-slate-900">
+                    {profileCopy.pillars[0]}
                   </p>
                 </div>
 
-                <div className="relative bg-emerald-100 border-2 border-slate-900 p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rotate-3">
-                  <p className="text-base md:text-xl font-black text-slate-900 mt-2">
-                    {t.home.timeToValue}
+                <div className="retro-hover relative flex min-h-12 items-center justify-center bg-emerald-100 border-2 border-slate-900 p-2 sm:min-h-16 sm:p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rotate-3">
+                  <p className="text-[10px] sm:text-base md:text-xl font-black leading-tight text-slate-900">
+                    {profileCopy.pillars[1]}
                   </p>
                 </div>
 
-                <div className="relative bg-pink-100 border-2 border-slate-900 p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-1">
-                  <p className="text-base md:text-xl font-black text-slate-900 mt-2">
-                    {t.home.efficiency}
+                <div className="retro-hover relative flex min-h-12 items-center justify-center bg-pink-100 border-2 border-slate-900 p-2 sm:min-h-16 sm:p-3 rounded-md text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-1">
+                  <p className="text-[10px] sm:text-base md:text-xl font-black leading-tight text-slate-900">
+                    {profileCopy.pillars[2]}
                   </p>
                 </div>
               </div>
             </div>
           </motion.div>
 
-          <div className="absolute lg:right-16 xl:right-24 top-1/2 -translate-y-1/2 flex items-center justify-center z-20 w-full lg:w-[50vw] max-w-3xl px-4 md:px-0">
+          <div
+            className={`window-host absolute inset-x-0 top-0 bottom-15 z-40 flex w-full max-w-3xl items-center justify-center px-0.5 sm:px-4 lg:px-0 ${
+              hasOpenWindow ? "pointer-events-auto" : "pointer-events-none"
+            }`}
+            aria-hidden={!hasOpenWindow}
+          >
             <AnimatePresence mode="wait">
-              {hasOpenWindow && (
+              {hasOpenWindow && currentActiveApp && (
                 <Window
                   id={currentActiveApp}
                   title={windowTitle ?? ""}
                   isActive={true}
                   onClose={() => ds.close(currentActiveApp)}
-                  onFocus={() => {}}
+                  onFocus={() => ds.bringToFront(currentActiveApp)}
                   initialFrom="center"
                 >
-                  {currentActiveApp === "about" && (
-                    <About language={language} />
-                  )}
+                  <Suspense
+                    fallback={
+                      <div className="flex min-h-48 items-center justify-center font-mono text-xs font-bold text-indigo-950" role="status">
+                        {t.desktop.loadingAssets}
+                      </div>
+                    }
+                  >
+                    {currentActiveApp === "about" && (
+                      <About language={language} profile={careerProfile} />
+                    )}
 
-                  {currentActiveApp === "experience" && (
-                    <Experience language={language} />
-                  )}
+                    {currentActiveApp === "experience" && (
+                      <Experience language={language} profile={careerProfile} />
+                    )}
 
-                  {currentActiveApp === "cases" && (
-                    <CaseStudies language={language} />
-                  )}
+                    {currentActiveApp === "cases" && (
+                      <CaseStudies language={language} profile={careerProfile} />
+                    )}
 
-                  {currentActiveApp === "skills" && (
-                    <Skills language={language} />
-                  )}
+                    {currentActiveApp === "skills" && (
+                      <Skills language={language} profile={careerProfile} />
+                    )}
 
-                  {currentActiveApp === "resume" && (
-                    <Resume language={language} />
-                  )}
+                    {currentActiveApp === "resume" && (
+                      <Resume language={language} profile={careerProfile} />
+                    )}
 
-                  {currentActiveApp === "contact" && (
-                    <Contact language={language} />
-                  )}
+                    {currentActiveApp === "contact" && (
+                      <Contact language={language} profile={careerProfile} />
+                    )}
+                  </Suspense>
                 </Window>
               )}
             </AnimatePresence>
@@ -706,6 +903,7 @@ export default function Desktop() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-100 flex items-center justify-center bg-black/40 p-4"
             onClick={() => setIsBookingOpen(false)}
+            role="presentation"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -713,16 +911,21 @@ export default function Desktop() {
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ type: "spring", stiffness: 150, damping: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-white border-4 border-slate-900 rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col"
+              className="w-full max-w-md max-h-[calc(100dvh-2rem)] bg-white border-4 border-slate-900 rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-y-auto flex flex-col"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="booking-dialog-title"
             >
               <div className="bg-indigo-950 px-4 py-3 flex items-center justify-between text-white shrink-0">
-                <span className="text-xs font-black uppercase tracking-wide">
+                <span id="booking-dialog-title" className="text-xs font-black uppercase tracking-wide">
                   {t.desktop.bookingTitle}
                 </span>
 
                 <button
+                  type="button"
                   onClick={() => setIsBookingOpen(false)}
-                  className="text-sm font-black hover:text-pink-300 transition cursor-pointer"
+                  className="flex h-8 w-8 items-center justify-center text-sm font-black hover:text-pink-300 transition cursor-pointer"
+                  aria-label={language === "fr" ? "Fermer" : "Close"}
                 >
                   ✕
                 </button>
@@ -769,7 +972,8 @@ export default function Desktop() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 120, opacity: 0 }}
             transition={{ type: "spring", stiffness: 120, damping: 18 }}
-            className="fixed right-20 bottom-28 w-70 bg-white border-6 border-slate-900 rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-4 z-50"
+            id="music-player"
+            className="fixed left-3 right-3 bottom-22 w-auto bg-white border-4 sm:border-6 border-slate-900 rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-4 z-50 sm:left-auto sm:right-20 sm:bottom-28 sm:w-70"
           >
             <div className="flex items-center justify-between mb-3">
               <span className="font-black text-xs uppercase text-slate-700">
@@ -777,8 +981,10 @@ export default function Desktop() {
               </span>
 
               <button
+                type="button"
                 onClick={() => setIsMusicOpen(false)}
-                className="text-xs font-black cursor-pointer"
+                className="flex h-8 w-8 items-center justify-center text-xs font-black cursor-pointer"
+                aria-label={language === "fr" ? "Fermer" : "Close"}
               >
                 ✕
               </button>
@@ -806,21 +1012,27 @@ export default function Desktop() {
         )}
       </AnimatePresence>
 
-      <motion.button
-        onClick={() => setIsMusicOpen(!isMusicOpen)}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        className="fixed bottom-10 right-24 z-50 w-16 h-16 rounded-full bg-green-700 border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-white text-xl cursor-pointer"
-      >
-        🎧
-      </motion.button>
+      {!isLoading && (
+        <motion.button
+          type="button"
+          onClick={() => setIsMusicOpen(!isMusicOpen)}
+          whileHover={{ scale: 1.08, rotate: -3 }}
+          whileTap={{ scale: 0.95 }}
+          className="music-toggle fixed bottom-19 right-3 z-40 w-12 h-12 sm:bottom-10 sm:right-24 sm:z-50 sm:w-16 sm:h-16 rounded-full bg-green-700 border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-white text-lg sm:text-xl cursor-pointer"
+          aria-label={t.desktop.nowPlaying}
+          aria-expanded={isMusicOpen}
+          aria-controls="music-player"
+        >
+          <span aria-hidden="true">🎧</span>
+        </motion.button>
+      )}
 
       {!isLoading && (
         <motion.div
           initial={{ y: 70, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.8, type: "spring", stiffness: 80 }}
-          className="fixed bottom-5 left-1/2 flex w-[min(92vw,800px)] -translate-x-1/2 items-center gap-3 rounded-2xl border-4 border-indigo-950 bg-white px-4 py-2 shadow-[4px_4px_0px_0px_rgba(30,27,75,1)] z-50"
+          className="taskbar fixed bottom-2 sm:bottom-5 left-1/2 flex w-[calc(100%-0.75rem)] sm:w-[min(94vw,960px)] -translate-x-1/2 items-center gap-1.5 sm:gap-3 rounded-xl sm:rounded-2xl border-3 sm:border-4 border-indigo-950 bg-white px-2 sm:px-4 py-1.5 sm:py-2 shadow-[4px_4px_0px_0px_rgba(30,27,75,1)] z-50 select-none"
         >
           <AnimatePresence>
             {isStartMenuOpen && (
@@ -830,7 +1042,8 @@ export default function Desktop() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 15, scale: 0.95 }}
                 transition={{ duration: 0.15 }}
-                className="absolute bottom-16 left-0 w-64 bg-white border-4 border-slate-900 rounded-2xl p-3 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-1 z-50"
+                id="start-menu"
+                className="absolute bottom-14 sm:bottom-16 left-0 w-[min(18rem,calc(100vw-1rem))] sm:w-64 bg-white border-4 border-slate-900 rounded-2xl p-3 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-1 z-50"
               >
                 <div className="bg-indigo-900 text-white font-black text-xs px-3 py-2 rounded-xl mb-2 uppercase tracking-wide">
                   {t.desktop.menu}
@@ -840,10 +1053,10 @@ export default function Desktop() {
                   <button
                     key={app.id}
                     onClick={() => {
-                      ds.open(app.id as any);
+                      ds.open(app.id);
                       setIsStartMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 text-left font-bold text-xs text-slate-800 transition active:scale-98"
+                    className="retro-menu-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 text-left font-bold text-xs text-slate-800 transition active:scale-98"
                   >
                     <span className="text-base">{app.icon}</span>
                     <span>{app.label[language]}</span>
@@ -854,18 +1067,29 @@ export default function Desktop() {
           </AnimatePresence>
 
           <button
+            type="button"
             ref={startButtonRef}
             onClick={() => setIsStartMenuOpen(!isStartMenuOpen)}
-            className={`rounded-xl border-2 border-slate-900 px-4 py-1.5 text-xs font-black uppercase text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition active:scale-95 ${
+            className={`taskbar-start shrink-0 rounded-lg sm:rounded-xl border-2 border-slate-900 px-2.5 sm:px-4 py-1.5 text-[10px] sm:text-xs font-black uppercase text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition active:scale-95 ${
               isStartMenuOpen
                 ? "bg-slate-800"
                 : "bg-indigo-900 hover:bg-indigo-950"
             }`}
+            aria-expanded={isStartMenuOpen}
+            aria-controls="start-menu"
           >
-            {t.desktop.folders}
+            <span className="sm:hidden" aria-hidden="true">▦</span>
+            <span className="hidden sm:inline">{t.desktop.folders}</span>
           </button>
 
-          <div className="relative flex-1">
+          <ProfileSwitcher
+            language={language}
+            profile={careerProfile}
+            onChange={handleProfileChange}
+            compact
+          />
+
+          <div className="taskbar-search relative min-w-0 flex-1">
             <input
               type="text"
               value={searchQuery}
@@ -876,8 +1100,9 @@ export default function Desktop() {
                   setIsSearchOpen(true);
                 }
               }}
-              className="w-full rounded-xl border-2 border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-bold outline-none text-slate-900 focus:border-indigo-500"
+              className="w-full min-w-0 rounded-lg sm:rounded-xl border-2 border-slate-300 bg-slate-50 px-2 sm:px-3 py-1.5 text-[10px] sm:text-xs font-bold outline-none text-slate-900 focus:border-indigo-500"
               placeholder={t.desktop.search}
+              aria-label={t.desktop.search}
               autoComplete="off"
             />
 
@@ -888,7 +1113,8 @@ export default function Desktop() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 5, scale: 0.98 }}
                   transition={{ duration: 0.12 }}
-                  className="absolute bottom-full left-0 mb-2 w-full overflow-hidden rounded-xl border-2 border-slate-900 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50"
+                  className="absolute bottom-full left-0 mb-2 w-[min(20rem,calc(100vw-1rem))] overflow-hidden rounded-xl border-2 border-slate-900 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50"
+                  role="listbox"
                 >
                   {searchResults.map((app, index) => (
                     <button
@@ -903,6 +1129,8 @@ export default function Desktop() {
                           ? "bg-indigo-100"
                           : "bg-white hover:bg-slate-100"
                       }`}
+                      role="option"
+                      aria-selected={index === selectedIndex}
                     >
                       <span className="text-base">{app.icon}</span>
 
@@ -922,7 +1150,7 @@ export default function Desktop() {
             </AnimatePresence>
           </div>
 
-          <div className="flex items-center rounded-xl border-2 border-slate-900 bg-slate-100 p-0.5">
+          <div className="taskbar-language flex shrink-0 items-center rounded-lg sm:rounded-xl border-2 border-slate-900 bg-slate-100 p-0.5" aria-label="Language">
             <button
               type="button"
               onClick={() => setLanguage("fr")}
@@ -931,6 +1159,7 @@ export default function Desktop() {
                   ? "bg-indigo-900 text-white"
                   : "text-slate-600"
               }`}
+              aria-pressed={language === "fr"}
             >
               FR
             </button>
@@ -943,16 +1172,20 @@ export default function Desktop() {
                   ? "bg-indigo-900 text-white"
                   : "text-slate-600"
               }`}
+              aria-pressed={language === "en"}
             >
               EN
             </button>
           </div>
 
           <button
+            type="button"
             onClick={() => setIsBookingOpen(true)}
-            className="whitespace-nowrap rounded-xl bg-pink-500 border-2 border-slate-900 px-4 py-1.5 text-xs font-black uppercase text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition hover:bg-pink-600 cursor-pointer"
+            className="taskbar-booking shrink-0 whitespace-nowrap rounded-lg sm:rounded-xl bg-pink-500 border-2 border-slate-900 px-2.5 sm:px-4 py-1.5 text-[10px] sm:text-xs font-black uppercase text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition hover:bg-pink-600 cursor-pointer"
+            aria-label={t.desktop.booking}
           >
-            {t.desktop.booking}
+            <span className="sm:hidden" aria-hidden="true">🗓️</span>
+            <span className="hidden sm:inline">{t.desktop.booking}</span>
           </button>
 
           <div className="hidden sm:block text-xs font-mono font-bold text-slate-700 bg-slate-100 border-2 border-slate-200 rounded-lg px-2 py-1 text-center min-w-21.25">
