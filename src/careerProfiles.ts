@@ -205,7 +205,7 @@ const frProduct: ProfileCopy = {
         period: "2024 – 2026",
         bullets: [
           "Cadrage d’offres, roadmap, recette et pilotage des KPI",
-          "Réduction des coûts d’environ 3 % et usage mobile en hausse d’environ 4 %",
+          "Réduction des coûts d’environ 2 % et usage mobile en hausse d’environ 4 %",
         ],
       },
       {
@@ -380,7 +380,7 @@ const frProject: ProfileCopy = {
         period: "2024 – 2026",
         bullets: [
           "Cadrage, coordination partenaires, reporting et recette fonctionnelle",
-          "Contribution à une réduction des coûts d’environ 3 %",
+          "Contribution à une réduction des coûts d’environ 2 %",
         ],
       },
       {
